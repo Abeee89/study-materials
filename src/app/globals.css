@@ -1,0 +1,423 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --neon-blue: #3b82f6;
+  --neon-cyan: #06b6d4;
+  --neon-purple: #a855f7;
+  --neon-pink: #ec4899;
+  --neon-green: #10b981;
+}
+
+.dark {
+  --background: #020617;
+  --foreground: #f1f5f9;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ============================================
+   NEON GLOW TEXT UTILITIES
+   ============================================ */
+
+.neon-text-blue {
+  color: #60a5fa;
+  text-shadow:
+    0 0 7px rgba(59, 130, 246, 0.6),
+    0 0 20px rgba(59, 130, 246, 0.4),
+    0 0 42px rgba(59, 130, 246, 0.2);
+}
+
+.neon-text-cyan {
+  color: #22d3ee;
+  text-shadow:
+    0 0 7px rgba(6, 182, 212, 0.6),
+    0 0 20px rgba(6, 182, 212, 0.4),
+    0 0 42px rgba(6, 182, 212, 0.2);
+}
+
+.neon-text-purple {
+  color: #c084fc;
+  text-shadow:
+    0 0 7px rgba(168, 85, 247, 0.6),
+    0 0 20px rgba(168, 85, 247, 0.4),
+    0 0 42px rgba(168, 85, 247, 0.2);
+}
+
+.neon-text-pink {
+  color: #f472b6;
+  text-shadow:
+    0 0 7px rgba(236, 72, 153, 0.6),
+    0 0 20px rgba(236, 72, 153, 0.4),
+    0 0 42px rgba(236, 72, 153, 0.2);
+}
+
+.neon-text-green {
+  color: #34d399;
+  text-shadow:
+    0 0 7px rgba(16, 185, 129, 0.6),
+    0 0 20px rgba(16, 185, 129, 0.4),
+    0 0 42px rgba(16, 185, 129, 0.2);
+}
+
+/* ============================================
+   NEON BORDER / GLOW EFFECTS
+   ============================================ */
+
+.neon-border-blue {
+  box-shadow:
+    0 0 5px rgba(59, 130, 246, 0.3),
+    0 0 15px rgba(59, 130, 246, 0.15),
+    inset 0 0 5px rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.neon-border-cyan {
+  box-shadow:
+    0 0 5px rgba(6, 182, 212, 0.3),
+    0 0 15px rgba(6, 182, 212, 0.15),
+    inset 0 0 5px rgba(6, 182, 212, 0.05);
+  border-color: rgba(6, 182, 212, 0.5);
+}
+
+.neon-border-purple {
+  box-shadow:
+    0 0 5px rgba(168, 85, 247, 0.3),
+    0 0 15px rgba(168, 85, 247, 0.15),
+    inset 0 0 5px rgba(168, 85, 247, 0.05);
+  border-color: rgba(168, 85, 247, 0.5);
+}
+
+/* ============================================
+   GLASSMORPHISM CARD
+   ============================================ */
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 1rem;
+}
+
+.dark .glass-card {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(148, 163, 184, 0.1);
+}
+
+.glass-card-hover:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(148, 163, 184, 0.4);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 0 15px rgba(59, 130, 246, 0.08);
+}
+
+.dark .glass-card-hover:hover {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: rgba(148, 163, 184, 0.2);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 15px rgba(59, 130, 246, 0.08);
+}
+
+/* ============================================
+   KEYFRAME ANIMATIONS
+   ============================================ */
+
+@keyframes neonPulse {
+  0%, 100% {
+    text-shadow:
+      0 0 7px rgba(59, 130, 246, 0.6),
+      0 0 20px rgba(59, 130, 246, 0.4),
+      0 0 42px rgba(59, 130, 246, 0.2);
+  }
+  50% {
+    text-shadow:
+      0 0 14px rgba(59, 130, 246, 0.8),
+      0 0 40px rgba(59, 130, 246, 0.6),
+      0 0 80px rgba(59, 130, 246, 0.3);
+  }
+}
+
+@keyframes neonPulseCyan {
+  0%, 100% {
+    text-shadow:
+      0 0 7px rgba(6, 182, 212, 0.5),
+      0 0 20px rgba(6, 182, 212, 0.3);
+  }
+  50% {
+    text-shadow:
+      0 0 14px rgba(6, 182, 212, 0.8),
+      0 0 40px rgba(6, 182, 212, 0.5),
+      0 0 70px rgba(6, 182, 212, 0.3);
+  }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes floatUp {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes gridPulse {
+  0%, 100% { opacity: 0.03; }
+  50% { opacity: 0.08; }
+}
+
+@keyframes electricArc {
+  0% { opacity: 0; transform: scaleX(0); }
+  50% { opacity: 1; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes countUp {
+  from { --num: 0; }
+  to { --num: 75; }
+}
+
+/* ============================================
+   ANIMATION UTILITY CLASSES
+   ============================================ */
+
+.animate-neon-pulse {
+  animation: neonPulse 3s ease-in-out infinite;
+}
+
+.animate-neon-pulse-cyan {
+  animation: neonPulseCyan 2.5s ease-in-out infinite;
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee-slow {
+  animation: marquee 45s linear infinite;
+}
+
+.animate-float {
+  animation: floatUp 4s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* ============================================
+   BACKGROUND EFFECTS
+   ============================================ */
+
+.bg-grid-pattern {
+  background-image:
+    linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridPulse 6s ease-in-out infinite;
+}
+
+.bg-radial-hero {
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(59, 130, 246, 0.12) 0%,
+    rgba(6, 182, 212, 0.06) 30%,
+    rgba(2, 6, 23, 0) 70%
+  );
+}
+
+/* ============================================
+   SCROLLBAR / MISC UTILITIES
+   ============================================ */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Progress bar neon effect */
+.progress-neon {
+  box-shadow:
+    0 0 6px rgba(59, 130, 246, 0.4),
+    0 0 12px rgba(59, 130, 246, 0.2);
+}
+
+/* Radio button custom style for assessment */
+input[type="radio"]:checked {
+  accent-color: #3b82f6;
+}
+
+/* Accordion content smooth height */
+.accordion-content {
+  overflow: hidden;
+}
+
+/* ============================================
+   CIRCUIT SIMULATOR — ANIMATIONS
+   ============================================ */
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+  25% { opacity: 1; transform: scale(1.2) rotate(90deg); }
+  50% { opacity: 0.6; transform: scale(0.8) rotate(180deg); }
+  75% { opacity: 1; transform: scale(1.1) rotate(270deg); }
+}
+
+@keyframes overheat {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4), 0 0 20px rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.8), 0 0 50px rgba(239, 68, 68, 0.4), 0 0 80px rgba(251, 146, 60, 0.3);
+    border-color: rgba(251, 146, 60, 0.9);
+  }
+}
+
+@keyframes lampPop {
+  0% { opacity: 1; transform: scale(1); filter: brightness(1); }
+  15% { opacity: 1; transform: scale(1.4); filter: brightness(4); }
+  30% { opacity: 1; transform: scale(1.6); filter: brightness(6); }
+  50% { opacity: 0.8; transform: scale(1.1); filter: brightness(0.3); }
+  100% { opacity: 0.5; transform: scale(0.95); filter: brightness(0.1); }
+}
+
+@keyframes dimGlow {
+  0%, 100% { opacity: 0.15; box-shadow: none; }
+  50% { opacity: 0.25; box-shadow: 0 0 4px rgba(253, 224, 71, 0.15); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-4px) rotate(-1deg); }
+  20% { transform: translateX(4px) rotate(1deg); }
+  30% { transform: translateX(-3px) rotate(-0.5deg); }
+  40% { transform: translateX(3px) rotate(0.5deg); }
+  50% { transform: translateX(-2px); }
+  60% { transform: translateX(2px); }
+  70% { transform: translateX(-1px); }
+  80% { transform: translateX(1px); }
+}
+
+@keyframes successPulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(52, 211, 153, 0.3), 0 0 20px rgba(52, 211, 153, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(52, 211, 153, 0.6), 0 0 40px rgba(52, 211, 153, 0.3), 0 0 60px rgba(52, 211, 153, 0.15);
+  }
+}
+
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-sparkle { animation: sparkle 0.4s ease-in-out infinite; }
+.animate-overheat { animation: overheat 0.6s ease-in-out infinite; }
+.animate-lamp-pop { animation: lampPop 0.8s ease-out forwards; }
+.animate-dim-glow { animation: dimGlow 2.5s ease-in-out infinite; }
+.animate-shake { animation: shake 0.5s ease-in-out; }
+.animate-success-pulse { animation: successPulse 1.5s ease-in-out infinite; }
+.animate-modal-slide-in { animation: modalSlideIn 0.35s ease-out forwards; }
+
+/* ============================================
+   CIRCUIT SIMULATOR — RANGE SLIDER
+   ============================================ */
+
+input[type="range"].circuit-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  outline: none;
+  transition: background 0.2s ease;
+}
+
+input[type="range"].circuit-slider.slider-blue {
+  background: linear-gradient(90deg, #1e3a5f, #3b82f6);
+}
+input[type="range"].circuit-slider.slider-orange {
+  background: linear-gradient(90deg, #4a2c0a, #f97316);
+}
+input[type="range"].circuit-slider.slider-green {
+  background: linear-gradient(90deg, #0a3a2a, #10b981);
+}
+
+input[type="range"].circuit-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: 2px solid #64748b;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type="range"].circuit-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+input[type="range"].circuit-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: 2px solid #64748b;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   CIRCUIT SIMULATOR — MODAL BACKDROP
+   ============================================ */
+
+.circuit-modal-backdrop {
+  background: rgba(2, 6, 23, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}

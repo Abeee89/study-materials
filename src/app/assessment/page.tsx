@@ -1,0 +1,64 @@
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+import { BookOpen, Clock, ChevronRight } from "lucide-react";
+
+export const dynamic = "force-dynamic";
+
+export default async function AssessmentMenuPage() {
+  const assessments = await prisma.assessment.findMany({
+    include: {
+      _count: {
+        select: { questions: true },
+      },
+    },
+    orderBy: {
+      id: "asc",
+    },
+  });
+
+  return (
+    <div className="flex flex-col min-h-[calc(100vh-64px)] p-6 md:p-16 max-w-5xl mx-auto w-full space-y-8">
+      <div>
+        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          Assessment <span className="neon-text-blue">Menu</span>
+        </h1>
+        <p className="text-slate-400 text-lg">
+          Select a chapter to test your knowledge. Each assessment contains specific questions and generates AI-driven Learning Outcomes.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {assessments.map((assessment) => (
+          <Link
+            href={`/assessment/${assessment.id}`}
+            key={assessment.id}
+            className="group block"
+          >
+            <div className="glass-card border border-slate-700/40 p-6 h-full flex flex-col justify-between hover:border-blue-500/50 hover:bg-slate-800/60 transition-all shadow-lg hover:shadow-blue-500/10">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">
+                  {assessment.title}
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-slate-400 mb-6">
+                  <div className="flex items-center gap-1.5">
+                    <BookOpen className="w-4 h-4 text-emerald-400" />
+                    {assessment._count.questions} Questions
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-amber-400" />
+                    {assessment.durationMins} Mins
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <span className="flex items-center gap-1 text-sm font-semibold text-blue-400 group-hover:text-blue-300">
+                  Start Assessment <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
