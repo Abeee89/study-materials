@@ -141,15 +141,15 @@ export default function OutcomesPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4 transition-colors">
           Learning <span className="neon-text-cyan">Outcomes</span>
         </h1>
-        <p className="text-slate-400 text-lg">
+        <p className="text-slate-600 dark:text-slate-400 text-lg transition-colors">
           Personalized strengths and weaknesses analysis powered by AI based on your latest assessment.
         </p>
 
         {error && (
-          <p className="text-amber-400 text-sm mt-3">{error}</p>
+          <p className="text-amber-600 dark:text-amber-400 text-sm mt-3 transition-colors">{error}</p>
         )}
       </motion.div>
 
@@ -162,11 +162,11 @@ export default function OutcomesPage() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="glass-card border border-slate-700/40 p-6 shadow-xl flex flex-col items-center text-center"
+            className="glass-card border border-slate-200 dark:border-slate-700/40 p-6 shadow-xl flex flex-col items-center text-center"
           >
             <div className="relative w-32 h-32 flex items-center justify-center mb-4">
               <svg className="absolute inset-0 w-full h-full -rotate-90">
-                <circle cx="64" cy="64" r="56" fill="transparent" stroke="currentColor" strokeWidth="8" className="text-slate-800" />
+                <circle cx="64" cy="64" r="56" fill="transparent" stroke="currentColor" strokeWidth="8" className="text-slate-200 dark:text-slate-800 transition-colors" />
                 <motion.circle
                   cx="64" cy="64" r="56"
                   fill="transparent"
@@ -188,10 +188,10 @@ export default function OutcomesPage() {
               </svg>
               <span className="text-4xl font-bold neon-text-blue">{loading ? "…" : percentLabel}</span>
             </div>
-            <h3 className="text-xl font-bold text-white">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white transition-colors">
               {attempt?.assessmentTitle || "Latest Assessment"} Score
             </h3>
-            <p className="text-slate-400 text-sm mt-1">
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 transition-colors">
               {loading
                 ? "Loading your latest attempt…"
                 : attempt
@@ -206,9 +206,9 @@ export default function OutcomesPage() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className="glass-card border border-slate-700/40 p-6 shadow-xl"
+            className="glass-card border border-slate-200 dark:border-slate-700/40 p-6 shadow-xl"
           >
-            <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4 transition-colors">
               <Target className="w-5 h-5 neon-text-green" />
               Strengths
             </h3>
@@ -220,8 +220,8 @@ export default function OutcomesPage() {
                   ? "No strengths analysis available yet."
                   : "Complete the assessment to generate outcomes.",
               ]).map((item, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm text-slate-300">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
+                <li key={idx} className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-300 transition-colors">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 mt-1.5 shrink-0" />
                   {item}
                 </li>
               ))}
@@ -234,10 +234,10 @@ export default function OutcomesPage() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.3 }}
-            className="glass-card border border-slate-700/40 p-6 shadow-xl"
+            className="glass-card border border-slate-200 dark:border-slate-700/40 p-6 shadow-xl"
           >
-            <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
-              <AlertTriangle className="w-5 h-5 text-amber-400" />
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4 transition-colors">
+              <AlertTriangle className="w-5 h-5 text-amber-500 dark:text-amber-400" />
               Needs Improvement
             </h3>
             <ul className="space-y-3">
@@ -248,8 +248,8 @@ export default function OutcomesPage() {
                   ? "No improvement areas available yet."
                   : "Complete the assessment to generate outcomes.",
               ]).map((item, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm text-slate-300">
-                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
+                <li key={idx} className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-300 transition-colors">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 mt-1.5 shrink-0" />
                   {item}
                 </li>
               ))}
@@ -265,14 +265,14 @@ export default function OutcomesPage() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="md:col-span-2"
         >
-          <div className="glass-card border border-slate-700/40 p-8 shadow-xl h-full flex flex-col">
-            <div className="flex items-center gap-3 mb-6 pb-6 border-b border-slate-800">
+          <div className="glass-card border border-slate-200 dark:border-slate-700/40 p-8 shadow-xl h-full flex flex-col">
+            <div className="flex items-center gap-3 mb-6 pb-6 border-b border-slate-200 dark:border-slate-800 transition-colors">
               <div className="bg-blue-500/10 p-3 rounded-xl border border-blue-500/20">
                 <BrainCircuit className="w-8 h-8 neon-text-blue" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white">AI Evaluation</h2>
-                <p className="text-slate-400 text-sm">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white transition-colors">AI Evaluation</h2>
+                <p className="text-slate-500 dark:text-slate-400 text-sm transition-colors">
                   {loading
                     ? "Loading…"
                     : generatedAtLabel
@@ -282,7 +282,7 @@ export default function OutcomesPage() {
               </div>
             </div>
 
-            <div className="flex-1 text-slate-300 leading-relaxed space-y-4">
+            <div className="flex-1 text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 transition-colors">
               {(() => {
                 const summary = evaluation?.summary || "";
                 const paragraphs = summary ? splitParagraphs(summary) : [];

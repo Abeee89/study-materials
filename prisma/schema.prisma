@@ -8,6 +8,8 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// ─── Authentication (NextAuth) ───
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -21,7 +23,6 @@ model User {
   progress      Progress[]
   attempts      AssessmentAttempt[]
   aiAnalyses    AIAnalysis[]
-  fileAssets    FileAsset[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @default(now()) @updatedAt
 }
@@ -64,42 +65,54 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Module {
-  id          String     @id @default(cuid())
+// ─── Curriculum Content ───
+
+model Chapter {
+  id          String       @id @default(cuid())
   title       String
-  order       Int
-  description String     @db.Text
-  objectives  String     @db.Text // Stored as JSON string
-  progress    Progress[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @default(now()) @updatedAt
+  sortOrder   Int          @unique
+  color       String       @default("blue")
+  level       String       @default("dasar")
+  subChapters SubChapter[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt
 }
+
+model SubChapter {
+  id          String   @id @default(cuid())
+  chapterId   String
+  title       String
+  objective   String   @db.Text
+  content     String   @db.Text
+  contentType String   @default("TEXT")
+  mediaUrl    String?
+  source      String?
+  sortOrder   Int
+
+  chapter     Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  @@index([chapterId])
+}
+
+// ─── Learning Progress ───
 
 model Progress {
   id        String   @id @default(cuid())
   userId    String
-  moduleId  String
+  chapterId String
   completed Boolean  @default(false)
   score     Int?
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
+  @@unique([userId, chapterId])
   @@index([userId])
-  @@index([moduleId])
 }
 
-model Material {
-  id          String    @id @default(cuid())
-  title       String
-  content     String    @db.Text
-  objectives  String    @db.Text // Stored as JSON string
-  pdfUrl      String?
-  moduleOrder Int       @unique
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now()) @updatedAt
-}
+// ─── Assessments & Quizzes ───
 
 model Assessment {
   id            String    @id @default(cuid())
@@ -114,7 +127,7 @@ model Question {
   id            String     @id @default(cuid())
   assessmentId  String
   text          String     @db.Text
-  options       String     @db.Text // Stored as JSON string
+  options       String     @db.Text
   correctAnswer String
   assessment    Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
 
@@ -147,17 +160,4 @@ model AIAnalysis {
   attempt       AssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-}
-
-model FileAsset {
-  id         String   @id @default(cuid())
-  name       String
-  path       String
-  size       Int
-  mimeType   String
-  createdAt  DateTime @default(now())
-  uploaderId String
-  uploader   User     @relation(fields: [uploaderId], references: [id])
-
-  @@index([uploaderId])
 }

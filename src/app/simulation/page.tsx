@@ -14,12 +14,12 @@ const modules = [
 ];
 
 const colors: Record<string, { text: string; bg: string; border: string; glow: string }> = {
-  blue: { text: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20", glow: "group-hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]" },
-  red: { text: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/20", glow: "group-hover:shadow-[0_0_20px_rgba(239,68,68,0.2)]" },
-  green: { text: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", glow: "group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]" },
-  purple: { text: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20", glow: "group-hover:shadow-[0_0_20px_rgba(168,85,247,0.2)]" },
-  amber: { text: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", glow: "group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)]" },
-  pink: { text: "text-pink-400", bg: "bg-pink-500/10", border: "border-pink-500/20", glow: "group-hover:shadow-[0_0_20px_rgba(236,72,153,0.2)]" },
+  blue: { text: "text-blue-600 dark:text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20", glow: "group-hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]" },
+  red: { text: "text-red-600 dark:text-red-400", bg: "bg-red-500/10", border: "border-red-500/20", glow: "group-hover:shadow-[0_0_20px_rgba(239,68,68,0.2)]" },
+  green: { text: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", glow: "group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]" },
+  purple: { text: "text-purple-600 dark:text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20", glow: "group-hover:shadow-[0_0_20px_rgba(168,85,247,0.2)]" },
+  amber: { text: "text-amber-600 dark:text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", glow: "group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)]" },
+  pink: { text: "text-pink-600 dark:text-pink-400", bg: "bg-pink-500/10", border: "border-pink-500/20", glow: "group-hover:shadow-[0_0_20px_rgba(236,72,153,0.2)]" },
 };
 
 export default function SimulationHub() {
@@ -31,10 +31,10 @@ export default function SimulationHub() {
         transition={{ duration: 0.5 }}
         className="mb-12"
       >
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4 transition-colors">
           Simulation <span className="neon-text-blue">Hub</span>
         </h1>
-        <p className="text-slate-400 text-lg max-w-2xl">
+        <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl transition-colors">
           Immerse yourself in interactive electrical modules. Experiment with components,
           visualize current flow, and build real circuits—all from your browser.
         </p>
@@ -58,11 +58,11 @@ export default function SimulationHub() {
                   <div className={`w-12 h-12 rounded-xl mb-4 flex items-center justify-center ${c.bg} ${c.text} border ${c.border}`}>
                     <Icon className="w-6 h-6" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                     Module {mod.id}: {mod.title}
                   </h3>
-                  <p className="text-slate-400 text-sm mb-4">{mod.desc}</p>
-                  <div className="flex items-center gap-1 text-sm text-slate-500 group-hover:text-cyan-400 transition-colors font-medium">
+                  <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 transition-colors">{mod.desc}</p>
+                  <div className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-cyan-400 transition-colors font-medium">
                     Launch
                     <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                   </div>

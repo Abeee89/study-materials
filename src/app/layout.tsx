@@ -18,8 +18,16 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/components/AuthProvider";
 
 export const metadata: Metadata = {
-  title: "Basic Electricity EdTech",
-  description: "Interactive learning platform for vocational high schools",
+  title: "Antigravity — AI-Powered Electrical Engineering Platform",
+  description:
+    "Interactive learning platform for vocational high schools. Master Basic Electricity with AI-driven assessments, circuit simulations, and structured curriculum.",
+  keywords: [
+    "basic electricity",
+    "electrical engineering",
+    "circuit simulation",
+    "AI learning",
+    "vocational education",
+  ],
 };
 
 export default function RootLayout({

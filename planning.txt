@@ -1,0 +1,435 @@
+# Software Requirements Specification (SRS) & Development Plan
+## Project: Antigravity — AI-Powered Web-Based Electrical Engineering Learning Platform
+
+---
+
+## 1. Project Overview & Scope
+
+### 1.1 Introduction
+**Antigravity** is an interactive, full-stack web-based educational ecosystem tailored for vocational and undergraduate students studying fundamental electrical engineering and electronics. The platform bridges theoretical concepts with active, practical application by embedding high-fidelity interactive simulation suites directly into a modern learning management system (LMS). 
+
+### 1.2 Core Value Proposition
+Every feature within the system is unified under an artificial intelligence umbrella driven by **OpenRouter API** free-tier models. The AI does not merely act as an isolated chatbot but serves as a persistent, context-aware pedagogical companion. It adapts to student workflows, reads live user states across chapters, and continuously parses performance metrics from formative evaluations to build individualized learning vectors.
+
+```
+                  +-----------------------------------+
+                  |      User Interaction Layer       |
+                  |  (Next.js App Router UI Front)    |
+                  +-----------------------------------+
+                                    |
+                    +---------------+---------------+
+                    |                               |
+                    v                               v
+        +-----------------------+       +-----------------------+
+        |   Learning Engine     |       |  Simulation Sandbox   |
+        |  - Structured Media   |       |  - Color-code Calc    |
+        |  - Formative Quizzes  |       |  - Dynamic Circuit Sim|
+        +-----------------------+       +-----------------------+
+                    |                               |
+                    +---------------+---------------+
+                                    |
+                                    v
+                  +-----------------------------------+
+                  |    Contextual Intelligence Layer  |
+                  |    (OpenRouter Serverless API)    |
+                  +-----------------------------------+
+                                    |
+                                    v
+                  +-----------------------------------+
+                  |      Persistent Storage Layer     |
+                  |     (PostgreSQL / Row Security)   |
+                  +-----------------------------------+
+```
+
+### 1.3 Strict Operational Constraints
+* **Framework Infrastructure:** Next.js 14+ (App Router), React Server Components (RSC).
+* **Database Engine:** PostgreSQL (Deployed via free-tier cloud instances like Neon.tech or Supabase).
+* **AI Provider:** OpenRouter API utilizing exclusively free inference models (e.g., `google/gemma-2-9b-it:free`, `meta-llama/llama-3-8b-instruct:free`).
+* **Deployment & Hosting Target:** Vercel (Hobby Free Tier).
+* **Cost Cap:** $0.00 USD total operational cost for base infrastructure.
+
+---
+
+## 2. Technical Stack Architecture
+
+The application layout leverages a modern, decoupled serverless architecture built on top of Vercel and cloud-native managed PostgreSQL.
+
+| Layer | Technology Selected | Rationale for Selection | Free-Tier Boundaries |
+| :--- | :--- | :--- | :--- |
+| **Frontend Framework** | Next.js 14+ (App Router) | Server-side rendering (SSR) for static content pages; optimized streaming API routes for real-time AI tokens. | Unlimited deployment limits on Vercel Hobby tier. |
+| **Styling & UI Components** | Tailwind CSS + Lucide Icons | Utility-first compilation ensures zero-runtime CSS overhead and blazing-fast performance. | Fully open-source / built-in. |
+| **State Management** | React Context + Local Hooks | Local state (`useState`, `useReducer`) handles heavy client-side mathematical math updates in circuit engines without server round-trips. | Client-side execution. |
+| **Authentication & Auth** | NextAuth.js (Auth.js v5) | Lightweight, secure Session-cookie handler natively integrated with Next.js middleware for role isolation. | Open-source. |
+| **Database Engine** | PostgreSQL (Neon / Supabase) | Supports native JSONB storage patterns for quizzes and provides full transactional integrity. | 0.5 GB storage, pool connections included. |
+| **Database Gateway** | Prisma ORM | Type-safe schema generation, automatic migration tracking, and intuitive JavaScript client generation. | Free open-source tool. |
+| **AI Inference Orchestration** | OpenRouter Serverless API | Consolidates open-source LLMs under a single, unified unified completion API without credit card bindings. | $0.00 rate-limited free token endpoints. |
+
+---
+
+## 3. Database Entity Relationship Blueprint (ERD)
+
+To support seamless cross-filtering across student pools, the relational schema models explicit separation between analytical evaluation snapshots, real-time progression telemetry, and administrative class configurations.
+
+```
+  +------------------+              +------------------+              +------------------+
+  |      USERS       |              |     CLASSES      |              |   ENROLLMENTS    |
+  +------------------+              +------------------+              +------------------+
+  | PK | id          |1            *| PK | id          |1            *| PK | id          |
+  |    | name        |--------------| FK | teacher_id  |--------------| FK | class_id    |
+  |    | email       |              |    | name        |              | FK | student_id  |
+  |    | password    |              |    | class_code  |              |    | enrolled_at |
+  |    | role (Enum) |              +------------------+              +------------------+
+  +------------------+                       |                                 ^
+           |                                 |                                 |
+           | 1                               | 1                               |
+           |                                 |                                 |
+           | * | * | *
+  +------------------+                       |                        +------------------+
+  |  AI_EVALUATIONS  |                       |                        |   SUB_CHAPTERS   |
+  +------------------+                       |                        +------------------+
+  | PK | id          |                       |                        | PK | id          |
+  | FK | student_id  |                       |                        | FK | chapter_id  |
+  |    | strengths   |                       |                        |    | title       |
+  |    | weaknesses  |                       |                        |    | content_type|
+  |    | suggestions |                       |                        |    | content_body|
+  |    | created_at  |                       |                        |    | media_url   |
+  +------------------+                       |                        +------------------+
+                                             |                                 |
+                                             |                                 | 1
+                                             v                                 v
+                                    +------------------+              +------------------+
+                                    |   ASSESSMENTS    |              |      QUIZZES     |
+                                    +------------------+              +------------------+
+                                    | PK | id          |* 1| PK | id          |
+                                    | FK | student_id  |--------------| FK | sub_chapter_id|
+                                    | FK | quiz_id     |              |    | title       |
+                                    |    | score       |              |    | questions   |
+                                    |    | answers     |              +------------------+
+                                    |    | completed_at|
+                                    +------------------+
+```
+
+### 3.1 Extended Prisma Schema Spec Configuration
+
+```prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  STUDENT
+  TEACHER
+}
+
+enum MediaType {
+  PDF
+  VIDEO
+  TEXT
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  name          String
+  email         String         @unique
+  passwordHash  String
+  role          UserRole       @default(STUDENT)
+  createdAt     DateTime       @default(now())
+  
+  // Relations
+  managedClasses Classes[]     @relation("TeacherClasses")
+  enrollments   Enrollment[]
+  assessments   Assessment[]
+  evaluations   AiEvaluation[]
+}
+
+model Classes {
+  id          Int          @id @default(autoincrement())
+  name        String
+  classCode   String       @unique
+  teacherId   Int
+  createdAt   DateTime     @default(now())
+  
+  // Relations
+  teacher     User         @relation("TeacherClasses", fields: [teacherId], references: [id], onDelete: Cascade)
+  enrollments Enrollment[]
+}
+
+model Enrollment {
+  id         Int      @id @default(autoincrement())
+  studentId  Int
+  classId    Int
+  enrolledAt DateTime @default(now())
+
+  // Relations
+  student    User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  class      Classes  @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, classId])
+}
+
+model Chapter {
+  id         Int          @id @default(autoincrement())
+  title      String
+  sortOrder  Int          @unique
+  subs       SubChapter[]
+}
+
+model SubChapter {
+  id          Int       @id @default(autoincrement())
+  chapterId   Int
+  title       String
+  contentType MediaType
+  contentBody String?   @db.Text
+  mediaUrl    String?
+  sortOrder   Int
+
+  // Relations
+  chapter     Chapter   @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  quiz        Quiz?
+}
+
+model Quiz {
+  id           Int          @id @default(autoincrement())
+  subChapterId Int          @unique
+  title        String
+  questions    Json         // Array format: [{question: string, options: string[], correct: string}]
+
+  // Relations
+  subChapter   SubChapter   @relation(fields: [subChapterId], references: [id], onDelete: Cascade)
+  assessments  Assessment[]
+}
+
+model Assessment {
+  id          Int      @id @default(autoincrement())
+  studentId   Int
+  quizId      Int
+  score       Int
+  studentAns  Json         // Key-value snapshot of student selections
+  completedAt DateTime @default(now())
+
+  // Relations
+  student     User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+model AiEvaluation {
+  id                    Int      @id @default(autoincrement())
+  studentId             Int
+  strengths             String   @db.Text
+  weaknesses            String   @db.Text
+  suggestions           String   @db.Text
+  recommendedSubChapters Int[]    // Primitive Int Array tracking needed lesson nodes
+  evaluatedAt           DateTime @default(now())
+
+  // Relations
+  student               User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+```
+
+---
+
+## 4. Curricular & Material Content Structure (Feature 1)
+
+Content layout maps directly to the targeted educational requirements framework, moving cleanly from atomic physics concepts through active electronic application nodes.
+
+```
+  ANTIGRAVITY CURRICULAR TREE
+  ├── Chapter 1: Foundations of Matter & Charge
+  │   └── Sub-chapter 1.1: Atomic Structures and Free Electrons (TEXT/HTML)
+  │   └── Sub-chapter 1.2: Conductors, Insulators, and Semiconductors (PDF Node)
+  ├── Chapter 2: Classifications of Engineering Materials
+  │   └── Sub-chapter 2.1: Resistive and Conductive Material Matrices (VIDEO)
+  │   └── Sub-chapter 2.2: Magnetic Core Alloys and Dielectrics (TEXT)
+  ├── Chapter 3: Core Electrodynamic Quantities
+  │   └── Sub-chapter 3.1: Voltage and Potential Difference Mechanics (TEXT)
+  │   └── Sub-chapter 3.2: Current Flow Dynamics and Ampere Scales (VIDEO)
+  │   └── Sub-chapter 3.3: Impedance, Resistance, and Thermal Dissipation (HTML)
+  │   └── Sub-chapter 3.4: Electrical Joule Power and Work Equations (TEXT)
+  ├── Chapter 4: Fundamental System Laws
+  │   └── Sub-chapter 4.1: Mathematical Proofs of Ohm's Law (V=IR) (TEXT)
+  │   └── Sub-chapter 4.2: Watt's Law for Multi-Variable Power Intersections (VIDEO)
+  ├── Chapter 5: Network Topology Concepts
+  │   └── Sub-chapter 5.1: Series Topologies and Loop Resistances (TEXT)
+  │   └── Sub-chapter 5.2: Parallel Topologies and Kirchhoff's Current Laws (VIDEO)
+  │   └── Sub-chapter 5.3: Complex Compound Mesh Networks (HTML Simulation Hook)
+  ├── Chapter 6: Practical Residential & Industrial Installations
+  │   └── Sub-chapter 6.1: Protective Elements, Circuit Breakers, and Grounding (PDF)
+  │   └── Sub-chapter 6.2: Single-Phase Distribution and Wire Sizing (TEXT)
+  └── Chapter 7: Active Electronics & Optoelectronics
+      └── Sub-chapter 7.1: PN-Junction Diodes and Signal Rectifiers (TEXT)
+      └── Sub-chapter 7.2: Optoelectronic Transducers, LEDs, and Photodetectors (VIDEO)
+```
+
+---
+
+## 5. Client-Side Mathematical Simulation Engines (Feature 2)
+
+To stay fully within free tier boundaries and bypass expensive backend computing clusters, interactive simulations are executed strictly within the client browser runtime environment.
+
+### 5.1 Resistor Color-Code Calculator Engine
+* **UI Interface:** Interactive multi-row dropdown selections corresponding to standard 4-band and 5-band structural paradigms.
+* **Algorithmic Model:** A zero-dependency mathematical map translating array indexes into multiplier exponents and exact numeric tolerances.
+$$	ext{Resistance Value} = \left( (	ext{Band}_1 	imes 10) + 	ext{Band}_2 
+ight) 	imes 10^{	ext{Band}_3}$$
+
+### 5.2 Dynamic DC Circuit Simulator Sandbox
+* **Visual Layer:** Built entirely using real-time rendering via SVG components or native HTML5 `<canvas>` objects. 
+* **Control Interfaces:** Fluid input sliders tracking variable voltages ($0	ext{V} 	o 48	ext{V}$) and configurable node resistance ranges ($1\Omega 	o 10	ext{k}\Omega$).
+* **Calculation Engine:** Built-in React state listeners execute linear equations instantaneously upon configuration change. For a classic single-loop series array containing dynamic sliders, the engine calculates state across elements using direct formulas:
+$$I = rac{V_{	ext{source}}}{\sum_{i=1}^{n} R_i} \quad 	ext{and} \quad V_{R_i} = I 	imes R_i$$
+Visual representations adapt fluidly—higher current levels animate a bright dashed path running faster along the wire vectors to illustrate actual physical behavior.
+
+---
+
+## 6. Full AI Integration Lifecycle (Features 4, 5, & 6)
+
+Every processing pipeline communicates with OpenRouter using standard structured serverless fetch payloads.
+
+```
+                    AI EVALUATION & ORCHESTRATION PIPELINE
+                    
+ +--------------------+       +--------------------+       +--------------------+
+ | Student Completes  |       | DB Query Trigger   |       | Next.js API Route  |
+ | Quiz Assessment    | ----> | Pulls Question,    | ----> | Formulates System  |
+ |                    |       | Answers, & Scores  |       | & Performance JSON |
+ +--------------------+       +--------------------+       +--------------------+
+                                                                     |
+                                                                     v
+ +--------------------+       +--------------------+       +--------------------+
+ | PostgreSQL Saved   |       | Structured JSON    |       | OpenRouter Endpoint|
+ | Evaluation Entry   | <---- | Parser Validates   | <---- | Returns Evaluation |
+ | (Strengths, Tasks) |       | Payload Integrity  |       | Response Payload   |
+ +--------------------+       +--------------------+       +--------------------+
+```
+
+### 6.1 Serverless API Architecture Route Sample (`/api/ai/evaluate/route.ts`)
+```typescript
+import { NextResponse } from 'next/server';
+
+export async function POST(req: Request) {
+  try {
+    const { studentId, quizId, score, studentAnswers, quizContext } = await req.json();
+
+    const systemPrompt = `You are an expert AI Electrical Engineering Professor inside the Antigravity learning platform. 
+Analyze the student's performance data completely. You must output your evaluation exactly in the following raw text block structure:
+[STRENGTHS]
+Summarize clear concepts mastered.
+[WEAKNESSES]
+Identify exact gaps or mathematical errors found.
+[SUGGESTIONS]
+Provide precise actionable study advice.`;
+
+    const userPrompt = `Student ID: ${studentId}
+Quiz Reference: ${quizContext.title}
+Score Achieved: ${score}%
+Detailed Response Matrix: ${JSON.stringify(studentAnswers)}
+Expected Questions Setup: ${JSON.stringify(quizContext.questions)}`;
+
+    const openRouterResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://antigravity-edu.vercel.app", 
+      },
+      body: JSON.stringify({
+        model: "google/gemma-2-9b-it:free",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: 0.3
+      })
+    });
+
+    const aiData = await openRouterResponse.json();
+    const rawAiText = aiData.choices[0].message.content;
+
+    // Inside full system architecture: Parse structural tokens and execute a Prisma INSERT directly into the Database.
+    return NextResponse.json({ rawEvaluation: rawAiText });
+  } catch (error) {
+    return NextResponse.json({ error: "Pipeline Failure" }, { status: 500 });
+  }
+}
+```
+
+### 6.2 Real-time Floating Assistant System Strategy
+To fulfill the requirement that **all features are integrated with AI**, the floating component listens continuously to the active route location path. When a user submits an input line, the client automatically appends the user's focus section as metadata:
+```json
+{
+  "active_module": "Chapter 4, Sub-chapter 4.1 (Ohm's Law Calculation View)",
+  "live_sandbox_state": { "current_slider_voltage": "12V", "current_slider_resistance": "4 Ohms" },
+  "user_query": "Why does current drop when I drag the resistor bar to the right?"
+}
+```
+
+---
+
+## 7. Operational Roles & Security Layers (Feature 5)
+
+Data separation is enforced globally at the Next.js Edge Layer using route-matching middleware architecture.
+
+```
+                             NEXT.JS MIDDLEWARE ROUTING
+                             
+                                   [ Incoming Request ]
+                                            |
+                                            v
+                                   /middleware.ts Engine
+                                            |
+                       +--------------------+--------------------+
+                       |                                         |
+                       v                                         v
+               Starts with /student                     Starts with /teacher
+                       |                                         |
+            [ Check Token Role ]                      [ Check Token Role ]
+                       |                                         |
+            +----------+----------+                   +----------+----------+
+            |                     |                   |                     |
+            v                     v                   v                     v
+       Role == STUDENT     Role != STUDENT       Role == TEACHER     Role != TEACHER
+            |                     |                   |                     |
+            v                     v                   v                     v
+       [ Allow Access ]    [ Redirect /login ]   [ Allow Access ]    [ Redirect /dashboard ]
+```
+
+### 7.1 Security Access Rules Map
+* **Student Route Domain (`/dashboard/student/*`):** Grant access to learning nodes, local simulations, self-quizzes, and personal historical AI assessment records.
+* **Teacher Analytics Domain (`/dashboard/teacher/*`):** Restrict access completely to `role === 'TEACHER'`. Route runs targeted PostgreSQL filters to view aggregated data grids:
+```sql
+SELECT u.name, u.email, ae.strengths, ae.weaknesses, ae.evaluated_at
+FROM users u
+JOIN enrollments e ON u.id = e.student_id
+JOIN ai_evaluations ae ON u.id = ae.student_id
+WHERE e.class_id = :targetClassId
+ORDER BY ae.evaluated_at DESC;
+```
+
+---
+
+## 8. Phased Implementation Sequence
+
+```
+  DEVELOPMENT MILESTONES ROADMAP
+  ├── Phase 1: Core Database Schematics & Security Foundations [Week 1]
+  │   ├── Instantiate free database node on Supabase/Neon.
+  │   ├── Run schema migrations through local Prisma CLI configurations.
+  │   └── Wire up multi-role authorization routines with secure NextAuth configuration.
+  ├── Phase 2: Static Material Layout & Local Sandboxes [Week 2]
+  │   ├── Build responsive sidebars populated with all 7 electrical curriculum chapters.
+  │   └── Code browser-side resistor calculators and mathematical circuit components.
+  ├── Phase 3: Evaluation Engine & OpenRouter API Wiring [Week 3]
+  │   ├── Program assessment interfaces to capture student array inputs.
+  │   └── Wire serverless route fetchers to query free-tier OpenRouter models.
+  └── Phase 4: Analytical Panels & Vercel Optimization [Week 4]
+      ├── Code teacher analytic boards to read individual class lists.
+      └── Standardize application configurations and deploy live to Vercel production servers.
+```
+
+---
+*End of Configuration Specification File (planning.md)*

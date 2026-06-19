@@ -1,192 +1,179 @@
-# Migrate Basic Electricity EdTech to Neon PostgreSQL & Deploy to Production
+# Antigravity v2 — Full Platform Rebuild
 
-## Background
+Complete rebuild of the "Basic Electricity" learning platform into a production-grade, Neon PostgreSQL-backed educational ecosystem with premium UI/UX and AI integration.
 
-The **Basic Electricity EdTech** platform is a Next.js 16 application (React 19, Tailwind v4) built for vocational high school students. It currently uses:
-- **SQLite** (`file:./dev.db`) as the local database via Prisma
-- **Netlify** as the deployment target (via `netlify.toml`)
-- **OpenRouter AI** for assessment evaluation and chatbot
+## Current State Analysis
 
-The application has 6 core features:
-1. **Home** — Animated landing page with formulas and feature cards
-2. **Materials** — 7 chapters of hardcoded learning content (client-side)
-3. **Simulation Hub** — 6 interactive electrical modules (Ohm's Law, Circuit Safety, Passive/Active Components, Circuit Sandbox, Capacitor Dynamics)
-4. **Assessment** — Database-backed chapter quizzes (7 assessments × 4 questions each)
-5. **Outcomes** — AI-powered learning evaluation from latest assessment attempt
-6. **Chatbot** — Context-aware AI tutor for Basic Electricity topics
+The existing codebase is a Next.js 16 app with:
+- **Database**: Prisma v5 with PostgreSQL schema (currently pointing to placeholder Neon URLs)
+- **Auth**: NextAuth v4 with Credentials provider + JWT sessions
+- **Content**: 7 chapters of hardcoded learning materials (in `materials/page.tsx`)
+- **Assessments**: 7 chapter quizzes seeded via `prisma/seed.ts` (4 questions each)
+- **Simulations**: 5 interactive components (Ohm's Law, Circuit Safety, Passive Gallery, Active Components, Circuit Sandbox)
+- **AI**: OpenRouter integration for evaluation + Chatbot
+- **Styling**: Tailwind CSS v4 + Framer Motion + GSAP with neon/glassmorphism theme
 
-**GitHub Repo**: `https://github.com/Abeee89/media-dasar-listrik.git`
+### Key Issues to Fix
+1. **Database not connected** — `.env` has placeholder URLs
+2. **Schema mismatch with planning.txt** — Current schema uses `Module` model but planning spec calls for `Chapter/SubChapter/Quiz` hierarchy
+3. **Materials are hardcoded** — Not from database
+4. **Dark-mode only text colors** — Many pages use `text-white` without light-mode variants
+5. **Missing Chapter 7 module page** — Only modules 1–6 exist
+6. **No Teacher dashboard** — Planning spec requires role-based dashboards
+7. **Performance section on homepage is static mock data**
 
 ---
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **Neon Database Credentials Needed**: I will need you to provide the Neon PostgreSQL pooled connection string (`postgres://...@ep-xxx.region.aws.neon.tech/dbname?sslmode=require`) after you create the project on [neon.tech](https://neon.tech). I can guide you through the creation process.
+> **Neon Database Setup**: The `.env` has placeholder DATABASE_URL values. You need to provide real Neon PostgreSQL connection strings, or I can guide you through creating a Neon project. Do you already have a Neon project set up?
 
 > [!IMPORTANT]
-> **Deployment Platform**: I'm recommending **Vercel** instead of Netlify for deployment since:
-> - Next.js 16 is a Vercel-native framework with first-class support
-> - Vercel's serverless functions handle Prisma + connection pooling better
-> - Netlify's Next.js adapter has known compatibility issues with newer Next.js versions
-> 
-> Do you have a Vercel account, or would you prefer to stay with Netlify?
+> **OpenRouter API Key**: The existing key in `.env` will be used — is it still valid?
+
+> [!WARNING]
+> **Schema Migration**: The current Prisma schema will be significantly updated to match the planning.txt spec (Chapter → SubChapter → Quiz hierarchy). This is a **destructive migration** — any existing data in the database will need to be re-seeded.
 
 > [!IMPORTANT]
-> **NextAuth Secret**: For production, we need a `NEXTAUTH_SECRET`. I'll generate a secure random string for this. You'll need to add it to your deployment environment variables.
+> **Deployment**: The plan includes Vercel deployment via the `deploy-to-vercel` skill. Do you have a Vercel account ready?
+
+---
 
 ## Open Questions
 
-> [!WARNING]
-> **File Upload Feature**: The current upload API writes files to the local filesystem (`public/uploads/`). On serverless platforms like Vercel, the filesystem is ephemeral — uploaded files will be lost. Options:
-> 1. **Remove the upload feature** for now (simplest)
-> 2. **Integrate cloud storage** (e.g., Vercel Blob, Cloudflare R2) — adds complexity
-> 3. **Keep it as-is** knowing it won't persist in production
-> 
-> Which approach do you prefer?
+1. **Language**: The materials page mixes English content with Indonesian UI labels ("Pelajari", "Gratis", "ulasan"). Should the UI be fully English or fully Indonesian?
+2. **Auth scope**: The planning spec mentions Teacher/Student roles with separate dashboards. Should I implement both dashboards for this version, or focus on the Student experience first?
+3. **Content additions**: Planning spec mentions PDF and VIDEO content types. Should I generate placeholder PDFs, or just keep the TEXT content from the current materials?
 
 ---
 
 ## Proposed Changes
 
-### Phase 1: Repository Consolidation & Architecture Cleanup
+### Phase 1: Database Schema & Neon Connection
 
-The codebase is already a well-structured Next.js monolith (not separate frontend/backend repos), so major restructuring isn't needed. However, several cleanup items are required:
+#### [MODIFY] [schema.prisma](file:///c:/Semester/Metopen/v1-DasarListrik/prisma/schema.prisma)
+- Update the Prisma schema to align with planning.txt ERD
+- Add `Chapter`, `SubChapter`, `Quiz` models as specified
+- Keep existing `User`, `Account`, `Session`, `Assessment`, `AssessmentAttempt`, `AIAnalysis` models
+- Add `Classes`, `Enrollment`, `AiEvaluation` models for teacher features
+- Configure for Neon PostgreSQL with pooled + direct URLs
 
-#### [MODIFY] [.env.example](file:///c:/Semester/Metopen/Dasar%20Listrik/.env.example)
-- Add `NEXTAUTH_SECRET` variable
-- Update `DATABASE_URL` comment to indicate Neon pooled connection string format
-- Add `DIRECT_URL` for Prisma migrations (non-pooled connection)
+#### [MODIFY] [seed.ts](file:///c:/Semester/Metopen/v1-DasarListrik/prisma/seed.ts)
+- Seed all 7 chapters with sub-chapters using the exact content from the current `materials/page.tsx`
+- Seed all 7 chapter assessments (already exists) 
+- Seed a demo Student and Teacher user with hashed passwords
 
-#### [MODIFY] [.gitignore](file:///c:/Semester/Metopen/Dasar%20Listrik/.gitignore)
-- Fix corrupted UTF-16 bytes at end of file (lines 48-50)
-- Add `prisma/dev.db` to prevent committing the SQLite file
-
-#### [DELETE] `prisma/dev.db`
-- Remove the local SQLite database file from the repo
-
----
-
-### Phase 2: Database Migration — SQLite → Neon PostgreSQL
-
-#### [MODIFY] [schema.prisma](file:///c:/Semester/Metopen/Dasar%20Listrik/prisma/schema.prisma)
-
-Key changes:
-```diff
- datasource db {
--  provider = "sqlite"
--  url      = env("DATABASE_URL")
-+  provider  = "postgresql"
-+  url       = env("DATABASE_URL")
-+  directUrl = env("DIRECT_URL")
- }
-```
-
-Additional schema improvements for PostgreSQL:
-- Add `@db.Text` annotation to long text fields (`content`, `feedback`, `options`, `objectives`) since PostgreSQL distinguishes `VARCHAR(191)` from `TEXT`
-- Add `@@index` for frequently queried foreign keys (`userId`, `assessmentId`, `moduleId`) to optimize JOIN performance
-- Add `createdAt`/`updatedAt` timestamps to tables missing them (`Progress`, `Module`, `Material`)
-
-#### [MODIFY] [seed.ts](file:///c:/Semester/Metopen/Dasar%20Listrik/prisma/seed.ts)
-- Use `upsert` instead of delete-then-create pattern (safer for PostgreSQL with FK constraints)
-- Also seed the `Module` and `Material` tables from the hardcoded data in `materials/page.tsx` to make the materials page database-driven
-
-#### [MODIFY] [prisma.ts](file:///c:/Semester/Metopen/Dasar%20Listrik/src/lib/prisma.ts)
-- Add connection pool configuration for Neon's serverless driver
-- Add `log` configuration for debugging connection issues
+#### [MODIFY] [.env](file:///c:/Semester/Metopen/v1-DasarListrik/.env)
+- Update with actual Neon connection strings (user must provide)
 
 ---
 
-### Phase 3: Application Code Refactoring
+### Phase 2: UI/UX Premium Redesign
 
-#### [MODIFY] [assessment/page.tsx](file:///c:/Semester/Metopen/Dasar%20Listrik/src/app/assessment/page.tsx)
-- Remove the unused `import { motion } from "framer-motion"` (it's a Server Component — framer-motion is a client library)
+Following the **ui-ux-pro-max** skill guidelines — applying glassmorphism, proper light/dark contrast, accessibility standards, and premium micro-interactions.
 
-#### [MODIFY] [api/assessment/submit/route.ts](file:///c:/Semester/Metopen/Dasar%20Listrik/src/app/api/assessment/submit/route.ts)
-- Add request body size validation (prevent excessively large payloads)
-- Add rate limiting consideration comment
+#### [MODIFY] [globals.css](file:///c:/Semester/Metopen/v1-DasarListrik/src/app/globals.css)
+- Fix light-mode support (currently only dark-mode neon text utilities work well)
+- Add proper light-mode glass-card variants with adequate contrast
+- Add skeleton loading animation utilities
+- Ensure 4.5:1 contrast ratio for all text in both modes
 
-#### [MODIFY] [api/upload/route.ts](file:///c:/Semester/Metopen/Dasar%20Listrik/src/app/api/upload/route.ts)
-- Based on user's decision about file uploads (see Open Questions)
+#### [MODIFY] [layout.tsx](file:///c:/Semester/Metopen/v1-DasarListrik/src/app/layout.tsx)
+- Update metadata to "Antigravity — AI-Powered Electrical Engineering Platform"
+- Keep existing providers, Navbar, Chatbot structure
 
-#### [MODIFY] [next.config.ts](file:///c:/Semester/Metopen/Dasar%20Listrik/next.config.ts)
-- Add `serverExternalPackages: ["@prisma/client"]` for proper Prisma bundling in serverless
+#### [MODIFY] [Navbar.tsx](file:///c:/Semester/Metopen/v1-DasarListrik/src/components/layout/Navbar.tsx)
+- Fix dark/light mode contrast issues
+- Add proper aria-labels per accessibility standards
+- Add active link indicator per ui-ux-pro-max nav rules
+
+#### [MODIFY] [page.tsx (Home)](file:///c:/Semester/Metopen/v1-DasarListrik/src/app/page.tsx)
+- Fix text colors that are dark-mode only (e.g., `text-white` → `text-slate-900 dark:text-white`)
+- Update "5 chapters" references to "7 chapters" 
+- Make the Performance section dynamic (fetch from API) instead of static mock
+
+#### [MODIFY] [materials/page.tsx](file:///c:/Semester/Metopen/v1-DasarListrik/src/app/materials/page.tsx)
+- Convert from hardcoded data to database-driven (fetch chapters + sub-chapters from Prisma)
+- Keep the same premium card design but fix dark/light mode contrast
+- Make the modal content fetch full sub-chapter text from DB
+
+#### [MODIFY] [simulation/page.tsx](file:///c:/Semester/Metopen/v1-DasarListrik/src/app/simulation/page.tsx)
+- Fix `text-white` → proper light/dark variants
+- Fix `text-slate-400` → proper light/dark variants
+
+#### [MODIFY] [assessment/page.tsx](file:///c:/Semester/Metopen/v1-DasarListrik/src/app/assessment/page.tsx)
+- Fix dark-mode only text colors
+- Already database-driven — just needs light-mode fixes
+
+#### [MODIFY] [outcomes/page.tsx](file:///c:/Semester/Metopen/v1-DasarListrik/src/app/outcomes/page.tsx)
+- Fix dark-mode only text colors throughout
+- Already database-driven
 
 ---
 
-### Phase 4: Production Deployment Configuration
+### Phase 3: Database-Driven Features
 
-#### [NEW] `vercel.json`
-- Configure build command, environment variables injection hints
-- Set proper function regions close to Neon database region
+#### [NEW] [src/app/api/materials/route.ts](file:///c:/Semester/Metopen/v1-DasarListrik/src/app/api/materials/route.ts)
+- API route to fetch all chapters with sub-chapters from database
 
-#### [MODIFY] [package.json](file:///c:/Semester/Metopen/Dasar%20Listrik/package.json)
-- Add `postinstall` script: `prisma generate` (required for Vercel builds)
-- Update `build` script if needed
+#### [NEW] [src/app/api/materials/[id]/route.ts](file:///c:/Semester/Metopen/v1-DasarListrik/src/app/api/materials/%5Bid%5D/route.ts)
+- API route to fetch single chapter with full sub-chapter content
 
-#### Environment Variables for Vercel:
-| Variable | Description |
-|---|---|
-| `DATABASE_URL` | Neon **pooled** connection string (`-pooler` suffix) |
-| `DIRECT_URL` | Neon **direct** connection string (for migrations) |
-| `NEXTAUTH_SECRET` | Random 32+ char string |
-| `NEXTAUTH_URL` | Production URL (auto-set by Vercel) |
-| `OPENROUTER_API_KEY` | Existing API key |
+#### [MODIFY] API routes under `src/app/api/`
+- Ensure all existing API routes (assessment, outcomes, chat, evaluators) work with the updated schema
+- Fix any TypeScript type issues
 
 ---
 
-### Phase 5: Post-Deployment E2E Testing & Issue Resolution
+### Phase 4: Missing Features & Polish
 
-#### [NEW] `issues.md`
-Testing matrix to execute and document:
+#### [NEW] [src/app/modules/7/page.tsx](file:///c:/Semester/Metopen/v1-DasarListrik/src/app/modules/7/page.tsx)
+- Add the missing Chapter 7 module page (Basic Electronics & Optoelectronics)
 
-| Test Category | What to Test |
-|---|---|
-| **Connection Stability** | Neon cold-start after idle (auto-suspend), connection timeout handling |
-| **Data Integrity** | Empty form submission, duplicate unique keys, excessively long strings (>10K chars), SQL injection attempts |
-| **Auth Flow** | Register → Login → Protected routes, session expiry, invalid credentials |
-| **Assessment Flow** | Full quiz submission, partial answers (nulls), re-submission, AI evaluation generation |
-| **API Robustness** | Invalid JSON body, missing fields, unauthorized access, rate limiting |
-| **Latency** | API response times under Neon free tier cold starts |
+#### [MODIFY] [Chatbot.tsx](file:///c:/Semester/Metopen/v1-DasarListrik/src/components/layout/Chatbot.tsx)
+- Fix dark/light mode contrast
+- Ensure proper touch targets (≥44px) per ui-ux-pro-max
 
-Each discovered issue will be documented in the format:
-```markdown
-### [ISSUE-XX]: Description
-- **Cause:** Root technical cause
-- **Evaluation:** User experience / stability impact
-- **Resolution:** Code fix applied
-```
+---
+
+### Phase 5: Build Verification & Deployment
+
+#### Build & Test
+- Run `prisma generate` and `prisma db push` against Neon
+- Run `prisma db seed` to populate data
+- Run `npm run build` to verify zero TypeScript errors
+- Run `npm run dev` and visually verify all pages
+
+#### Deploy to Vercel
+- Follow `deploy-to-vercel` skill workflow
+- Set environment variables on Vercel
+- Verify production deployment
 
 ---
 
 ## Verification Plan
 
 ### Automated Tests
-1. **Build verification**: `npm run build` completes without errors
-2. **Prisma migration**: `npx prisma migrate deploy` succeeds against Neon
-3. **Seed verification**: `npx prisma db seed` populates all 7 assessments + questions
-4. **Browser E2E tests**: Using the browser subagent tool to:
-   - Navigate all pages and verify rendering
-   - Complete a full registration → login → assessment → outcomes flow
-   - Test edge cases (empty submissions, long inputs, rapid submissions)
-   - Verify chatbot responds correctly
+```bash
+# 1. Prisma schema validation
+npx prisma validate
+
+# 2. TypeScript compilation
+npm run build
+
+# 3. Dev server smoke test
+npm run dev
+```
+
+### Browser Testing
+- Navigate to all pages: `/`, `/materials`, `/simulation`, `/assessment`, `/outcomes`
+- Verify light and dark mode on each page
+- Test the assessment flow end-to-end
+- Test the AI chatbot
+- Verify responsive behavior at 375px and 1440px
 
 ### Manual Verification
-1. **Live URL**: Confirm the deployed Vercel URL loads and all features work
-2. **Database verification**: Check Neon dashboard shows correct tables and data
-3. **Cold start test**: Wait for Neon to auto-suspend (~5 min idle), then hit the app and verify graceful reconnection
-
----
-
-## Execution Order
-
-```mermaid
-graph TD
-    A[Phase 1: Clean up repo] --> B[Phase 2: Migrate schema to PostgreSQL]
-    B --> C[User provides Neon connection string]
-    C --> D[Phase 3: Refactor code for production]
-    D --> E[Phase 4: Deploy to Vercel]
-    E --> F[Phase 5: Run migration + seed on Neon]
-    F --> G[Phase 5: E2E testing & bug fixing]
-    G --> H[Deliverables: issues.md + walkthrough.md]
-```
+- Confirm database is seeded with all 7 chapters
+- Confirm assessments load from database
+- Confirm AI evaluation flow works after quiz completion
