@@ -8,7 +8,20 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ─── Authentication (NextAuth) ───
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  STUDENT
+  TEACHER
+}
+
+enum MediaType {
+  TEXT
+  PDF
+  VIDEO
+}
+
+// ─── Authentication Models (NextAuth) ────────────────────────────────────────
 
 model User {
   id            String    @id @default(cuid())
@@ -17,29 +30,39 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
-  role          String    @default("STUDENT")
+  role          UserRole  @default(STUDENT)
+
+  // Auth relations
   accounts      Account[]
   sessions      Session[]
+
+  // Learning relations
   progress      Progress[]
   attempts      AssessmentAttempt[]
   aiAnalyses    AIAnalysis[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
+  aiEvaluations AiEvaluation[]
+
+  // Class relations
+  enrollments    Enrollment[]
+  managedClasses Classes[]   @relation("TeacherClasses")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String? @db.Text
-  access_token       String? @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String? @db.Text
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -65,71 +88,74 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// ─── Curriculum Content ───
+// ─── Curricular Content Models ────────────────────────────────────────────────
 
 model Chapter {
   id          String       @id @default(cuid())
   title       String
+  description String       @db.Text
   sortOrder   Int          @unique
-  color       String       @default("blue")
-  level       String       @default("dasar")
+  colorKey    String       @default("blue")  // UI color hint: blue, cyan, purple, pink, green
+  level       String       @default("dasar") // dasar | intermediate | mastery
+  iconKey     String       @default("book")  // matches Lucide icon name
+
   subChapters SubChapter[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @default(now()) @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model SubChapter {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   chapterId   String
   title       String
-  objective   String   @db.Text
-  content     String   @db.Text
-  contentType String   @default("TEXT")
-  mediaUrl    String?
+  objective   String    @db.Text
+  contentType MediaType @default(TEXT)
+  contentBody String    @db.Text
   source      String?
+  mediaUrl    String?
   sortOrder   Int
 
-  chapter     Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
+  chapter  Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  quiz     Quiz?
 
   @@index([chapterId])
 }
 
-// ─── Learning Progress ───
+model Quiz {
+  id           String @id @default(cuid())
+  subChapterId String @unique
+  title        String
 
-model Progress {
-  id        String   @id @default(cuid())
-  userId    String
-  chapterId String
-  completed Boolean  @default(false)
-  score     Int?
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  // JSON array: [{question: string, options: string[], correct: string}]
+  questions Json
 
-  @@unique([userId, chapterId])
-  @@index([userId])
+  subChapter  SubChapter          @relation(fields: [subChapterId], references: [id], onDelete: Cascade)
+  assessments AssessmentAttempt[]
 }
 
-// ─── Assessments & Quizzes ───
+// ─── Assessment Models ───────────────────────────────────────────────────────
 
+/// Top-level assessment bank (one per chapter)
 model Assessment {
-  id            String    @id @default(cuid())
-  title         String
-  durationMins  Int
-  questions     Question[]
-  attempts      AssessmentAttempt[]
-  createdAt     DateTime  @default(now())
+  id           String     @id @default(cuid())
+  title        String
+  durationMins Int
+  chapterOrder Int?       // links to chapter sortOrder for ordering
+  questions    Question[]
+  attempts     AssessmentAttempt[]
+
+  createdAt DateTime @default(now())
 }
 
 model Question {
-  id            String     @id @default(cuid())
-  assessmentId  String
-  text          String     @db.Text
-  options       String     @db.Text
+  id           String     @id @default(cuid())
+  assessmentId String
+  text         String     @db.Text
+  options      String     @db.Text // JSON string: string[]
   correctAnswer String
-  assessment    Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
 
   @@index([assessmentId])
 }
@@ -138,12 +164,15 @@ model AssessmentAttempt {
   id            String    @id @default(cuid())
   userId        String
   assessmentId  String
+  quizId        String?   // optional link to sub-chapter quiz
   score         Int
   timeSpentSecs Int
   completedAt   DateTime  @default(now())
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  assessment    Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
-  aiAnalysis    AIAnalysis?
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  quiz       Quiz?      @relation(fields: [quizId], references: [id])
+  aiAnalysis AIAnalysis?
 
   @@index([userId])
   @@index([assessmentId])
@@ -151,13 +180,73 @@ model AssessmentAttempt {
 }
 
 model AIAnalysis {
-  id            String    @id @default(cuid())
-  userId        String
-  attemptId     String    @unique
-  feedback      String    @db.Text
-  createdAt     DateTime  @default(now())
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  attempt       AssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  userId    String
+  attemptId String   @unique
+  feedback  String   @db.Text
+  createdAt DateTime @default(now())
+
+  user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attempt AssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+/// Richer AI evaluation record (strengths / weaknesses / suggestions)
+model AiEvaluation {
+  id                    String   @id @default(cuid())
+  studentId             String
+  strengths             String   @db.Text
+  weaknesses            String   @db.Text
+  suggestions           String   @db.Text
+  evaluatedAt           DateTime @default(now())
+
+  student User @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+}
+
+// ─── Legacy Progress Model ────────────────────────────────────────────────────
+
+model Progress {
+  id        String   @id @default(cuid())
+  userId    String
+  moduleId  String   // references chapter ID or assessment ID
+  completed Boolean  @default(false)
+  score     Int?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([userId])
+  @@index([moduleId])
+}
+
+// ─── Class Management Models ──────────────────────────────────────────────────
+
+model Classes {
+  id        String   @id @default(cuid())
+  name      String
+  classCode String   @unique
+  teacherId String
+  createdAt DateTime @default(now())
+
+  teacher     User         @relation("TeacherClasses", fields: [teacherId], references: [id], onDelete: Cascade)
+  enrollments Enrollment[]
+}
+
+model Enrollment {
+  id         String   @id @default(cuid())
+  studentId  String
+  classId    String
+  enrolledAt DateTime @default(now())
+
+  student User    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  class   Classes @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, classId])
+  @@index([studentId])
+  @@index([classId])
 }

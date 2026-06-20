@@ -10,16 +10,22 @@ export async function GET() {
       include: {
         subChapters: {
           orderBy: { sortOrder: "asc" },
+          select: {
+            id: true,
+            title: true,
+            objective: true,
+            contentType: true,
+            sortOrder: true,
+            source: true,
+          },
         },
+        _count: { select: { subChapters: true } },
       },
     });
 
-    return NextResponse.json({ chapters }, { status: 200 });
+    return NextResponse.json({ chapters });
   } catch (error) {
-    console.error("Materials API error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error("[GET /api/materials]", error);
+    return NextResponse.json({ error: "Failed to fetch materials" }, { status: 500 });
   }
 }

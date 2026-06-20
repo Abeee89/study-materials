@@ -2,36 +2,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ============================================
-   DESIGN TOKENS
-   ============================================ */
-
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
-  --card-bg: rgba(255, 255, 255, 0.7);
-  --card-border: rgba(148, 163, 184, 0.25);
-  --card-hover-bg: rgba(255, 255, 255, 0.9);
-  --card-hover-border: rgba(148, 163, 184, 0.45);
-  --neon-blue: #2563eb;
-  --neon-cyan: #0891b2;
-  --neon-purple: #7c3aed;
-  --neon-pink: #db2777;
-  --neon-green: #059669;
-}
-
-.dark {
-  --background: #020617;
-  --foreground: #f1f5f9;
-  --card-bg: rgba(15, 23, 42, 0.6);
-  --card-border: rgba(148, 163, 184, 0.1);
-  --card-hover-bg: rgba(15, 23, 42, 0.8);
-  --card-hover-border: rgba(148, 163, 184, 0.2);
   --neon-blue: #3b82f6;
   --neon-cyan: #06b6d4;
   --neon-purple: #a855f7;
   --neon-pink: #ec4899;
   --neon-green: #10b981;
+}
+
+.dark {
+  --background: #020617;
+  --foreground: #f1f5f9;
 }
 
 @theme inline {
@@ -50,13 +33,11 @@ body {
 }
 
 /* ============================================
-   NEON GLOW TEXT UTILITIES (Light/Dark aware)
+   NEON GLOW TEXT UTILITIES
    ============================================ */
 
 .neon-text-blue {
-  color: var(--neon-blue);
-}
-.dark .neon-text-blue {
+  color: #60a5fa;
   text-shadow:
     0 0 7px rgba(59, 130, 246, 0.6),
     0 0 20px rgba(59, 130, 246, 0.4),
@@ -64,9 +45,7 @@ body {
 }
 
 .neon-text-cyan {
-  color: var(--neon-cyan);
-}
-.dark .neon-text-cyan {
+  color: #22d3ee;
   text-shadow:
     0 0 7px rgba(6, 182, 212, 0.6),
     0 0 20px rgba(6, 182, 212, 0.4),
@@ -74,9 +53,7 @@ body {
 }
 
 .neon-text-purple {
-  color: var(--neon-purple);
-}
-.dark .neon-text-purple {
+  color: #c084fc;
   text-shadow:
     0 0 7px rgba(168, 85, 247, 0.6),
     0 0 20px rgba(168, 85, 247, 0.4),
@@ -84,9 +61,7 @@ body {
 }
 
 .neon-text-pink {
-  color: var(--neon-pink);
-}
-.dark .neon-text-pink {
+  color: #f472b6;
   text-shadow:
     0 0 7px rgba(236, 72, 153, 0.6),
     0 0 20px rgba(236, 72, 153, 0.4),
@@ -94,9 +69,7 @@ body {
 }
 
 .neon-text-green {
-  color: var(--neon-green);
-}
-.dark .neon-text-green {
+  color: #34d399;
   text-shadow:
     0 0 7px rgba(16, 185, 129, 0.6),
     0 0 20px rgba(16, 185, 129, 0.4),
@@ -108,9 +81,6 @@ body {
    ============================================ */
 
 .neon-border-blue {
-  border-color: rgba(59, 130, 246, 0.3);
-}
-.dark .neon-border-blue {
   box-shadow:
     0 0 5px rgba(59, 130, 246, 0.3),
     0 0 15px rgba(59, 130, 246, 0.15),
@@ -119,9 +89,6 @@ body {
 }
 
 .neon-border-cyan {
-  border-color: rgba(6, 182, 212, 0.3);
-}
-.dark .neon-border-cyan {
   box-shadow:
     0 0 5px rgba(6, 182, 212, 0.3),
     0 0 15px rgba(6, 182, 212, 0.15),
@@ -130,9 +97,6 @@ body {
 }
 
 .neon-border-purple {
-  border-color: rgba(168, 85, 247, 0.3);
-}
-.dark .neon-border-purple {
   box-shadow:
     0 0 5px rgba(168, 85, 247, 0.3),
     0 0 15px rgba(168, 85, 247, 0.15),
@@ -141,27 +105,33 @@ body {
 }
 
 /* ============================================
-   GLASSMORPHISM CARD (Light/Dark aware)
+   GLASSMORPHISM CARD
    ============================================ */
 
 .glass-card {
-  background: var(--card-bg);
+  background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--card-border);
+  border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 1rem;
-  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dark .glass-card {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(148, 163, 184, 0.1);
 }
 
 .glass-card-hover:hover {
-  background: var(--card-hover-bg);
-  border-color: var(--card-hover-border);
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(148, 163, 184, 0.4);
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.08),
-    0 0 15px rgba(59, 130, 246, 0.06);
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 0 15px rgba(59, 130, 246, 0.08);
 }
 
 .dark .glass-card-hover:hover {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: rgba(148, 163, 184, 0.2);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.3),
     0 0 15px rgba(59, 130, 246, 0.08);
@@ -231,11 +201,6 @@ body {
   to { --num: 75; }
 }
 
-@keyframes skeletonPulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
-}
-
 /* ============================================
    ANIMATION UTILITY CLASSES
    ============================================ */
@@ -269,10 +234,6 @@ body {
   );
   background-size: 200% 100%;
   animation: shimmer 3s ease-in-out infinite;
-}
-
-.animate-skeleton {
-  animation: skeletonPulse 1.5s ease-in-out infinite;
 }
 
 /* ============================================

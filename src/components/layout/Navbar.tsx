@@ -14,7 +14,7 @@ const links = [
   { href: "/materials", label: "Materials", icon: BookOpen },
   { href: "/simulation", label: "Simulation", icon: LayoutDashboard },
   { href: "/assessment", label: "Assessment", icon: PenTool },
-  { href: "/outcomes", label: "Outcomes", icon: Target },
+  { href: "/outcomes", label: "Learning Outcomes", icon: Target },
 ];
 
 export function Navbar() {
@@ -28,13 +28,10 @@ export function Navbar() {
   };
 
   return (
-    <nav
-      className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800/60 bg-white/70 dark:bg-slate-950/70 backdrop-blur-2xl transition-colors duration-300"
-      aria-label="Main navigation"
-    >
+    <nav className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800/60 bg-white/70 dark:bg-slate-950/70 backdrop-blur-2xl transition-colors duration-300">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group" aria-label="Antigravity Home">
+        <Link href="/" className="flex items-center gap-2.5 group">
           <motion.div
             animate={{ 
               filter: [
@@ -45,10 +42,10 @@ export function Navbar() {
             }}
             transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <Zap className="h-6 w-6 text-blue-500 dark:text-blue-400" />
+            <Zap className="h-6 w-6 text-blue-400" />
           </motion.div>
           <span className="font-bold text-lg text-slate-900 dark:text-white tracking-tight transition-colors">
-            Anti<span className="neon-text-blue">gravity</span>
+            Basic <span className="neon-text-blue">Electricity</span>
           </span>
         </Link>
 
@@ -66,12 +63,11 @@ export function Navbar() {
               >
                 <Link
                   href={link.href}
-                  aria-current={isActive ? "page" : undefined}
                   className={cn(
                     "relative flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-300",
                     isActive
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                      ? "text-blue-400"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -94,12 +90,12 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           {status === "loading" ? null : session ? (
             <div className="hidden md:flex items-center gap-3 mr-2">
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              <span className="text-sm font-medium text-slate-300">
                 {session.user?.name}
               </span>
               <button
                 onClick={() => signOut()}
-                className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700"
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors border border-slate-700"
               >
                 Logout
               </button>
@@ -108,7 +104,7 @@ export function Navbar() {
             <div className="hidden md:flex items-center gap-2 mr-2">
               <Link
                 href="/login"
-                className="text-sm font-medium px-4 py-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                className="text-sm font-medium px-4 py-2 text-slate-300 hover:text-white transition-colors"
               >
                 Sign In
               </Link>
@@ -135,7 +131,6 @@ export function Navbar() {
             onClick={() => setMobileOpen(!mobileOpen)}
             className="md:hidden text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors p-2"
             aria-label="Toggle mobile menu"
-            aria-expanded={mobileOpen}
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -150,7 +145,7 @@ export function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="md:hidden border-t border-slate-200 dark:border-slate-800/60 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl overflow-hidden"
+            className="md:hidden border-t border-slate-800/60 bg-slate-950/95 backdrop-blur-xl overflow-hidden"
           >
             <div className="px-4 py-4 space-y-1">
               {links.map((link, i) => {
@@ -169,8 +164,8 @@ export function Navbar() {
                       className={cn(
                         "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                         isActive
-                          ? "text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20"
-                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                          ? "text-blue-400 bg-blue-500/10 border border-blue-500/20"
+                          : "text-slate-400 hover:text-white hover:bg-slate-800/60"
                       )}
                     >
                       <Icon className="h-4 w-4" />
@@ -179,26 +174,6 @@ export function Navbar() {
                   </motion.div>
                 );
               })}
-
-              {/* Mobile auth */}
-              {status !== "loading" && !session && (
-                <div className="pt-3 border-t border-slate-200 dark:border-slate-800 mt-3 flex gap-2">
-                  <Link
-                    href="/login"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex-1 text-center text-sm font-medium px-4 py-2.5 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl transition-colors"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex-1 text-center text-sm font-semibold px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition-colors"
-                  >
-                    Register
-                  </Link>
-                </div>
-              )}
             </div>
           </motion.div>
         )}

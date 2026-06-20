@@ -38,14 +38,14 @@ const features = [
   {
     href: "/materials",
     title: "Learning Materials",
-    desc: "7 structured chapters with theory, formulas, and downloadable resources.",
+    desc: "5 structured chapters with theory, formulas, and downloadable PDF resources.",
     icon: BookOpen,
     neon: "green",
   },
   {
     href: "/assessment",
     title: "Assessment",
-    desc: "Chapter-specific quizzes with instant scoring and AI-powered feedback.",
+    desc: "20 timed exam questions across all chapters with instant scoring and feedback.",
     icon: PenTool,
     neon: "purple",
   },
@@ -205,7 +205,7 @@ export default function Home() {
         className="relative flex flex-col items-center justify-center px-6 py-20 md:py-32 text-center max-w-5xl mx-auto"
       >
         {/* Electrical Background Animation */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10 flex items-center justify-center opacity-20 dark:opacity-50">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10 flex items-center justify-center opacity-40 dark:opacity-50">
           <svg className="w-full h-full max-w-5xl" viewBox="0 0 1000 400" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path ref={el => { if (el && !circuitPaths.current.includes(el)) circuitPaths.current.push(el); }} d="M 50,200 L 250,200 L 300,100 L 450,100 L 500,200 L 650,200 L 700,300 L 850,300 L 900,200 L 950,200" stroke="url(#paint0_linear)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
             <path ref={el => { if (el && !circuitPaths.current.includes(el)) circuitPaths.current.push(el); }} d="M 0,150 L 150,150 L 200,50 L 350,50 L 400,150 L 550,150 L 600,250 L 750,250 L 800,150 L 1000,150" stroke="url(#paint1_linear)" strokeWidth="2" strokeDasharray="6 6" />
@@ -245,7 +245,7 @@ export default function Home() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500" />
           </span>
-          AI-Powered Learning Platform
+          Vocational High School Platform
         </div>
 
         {/* Main Heading — GSAP stagger + neon glow */}
@@ -304,9 +304,9 @@ export default function Home() {
           <div className="animate-marquee flex items-center gap-12">
             {[...formulas, ...formulas].map((f, i) => (
               <span key={i} className="flex items-center gap-3 text-sm md:text-base">
-                <span className="text-slate-600 dark:text-slate-500 font-medium transition-colors">{f.label}</span>
+                <span className="text-slate-600 dark:text-slate-500 font-medium">{f.label}</span>
                 <span className={`font-mono font-bold ${f.color}`}>{f.formula}</span>
-                <span className="text-slate-300 dark:text-slate-700 transition-colors">•</span>
+                <span className="text-slate-300 dark:text-slate-700">•</span>
               </span>
             ))}
           </div>
@@ -355,13 +355,13 @@ export default function Home() {
                     >
                       <Icon className="w-6 h-6" />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
                       {item.title}
                     </h3>
                     <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed transition-colors duration-300">
                       {item.desc}
                     </p>
-                    <div className="mt-5 flex items-center gap-1.5 text-sm font-medium text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <div className="mt-5 flex items-center gap-1.5 text-sm font-medium text-slate-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
                       Explore
                       <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                     </div>
@@ -403,7 +403,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ delay: idx * 0.08, duration: 0.4 }}
               whileHover={{ scale: 1.03, y: -4 }}
-              className="shrink-0 w-72 glass-card p-6 snap-center shadow-xl border border-slate-200 dark:border-slate-700/50 hover:border-cyan-400 dark:hover:border-cyan-500/30 transition-colors"
+              className="shrink-0 w-72 glass-card p-6 snap-center shadow-xl border border-slate-200 dark:border-slate-700/50 hover:border-cyan-300 dark:hover:border-cyan-500/30 transition-colors"
             >
               <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-300 mb-2 transition-colors duration-300">
                 {snip.title}

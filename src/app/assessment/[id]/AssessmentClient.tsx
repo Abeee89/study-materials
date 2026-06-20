@@ -141,19 +141,19 @@ export default function AssessmentClient({ assessment, questions }: AssessmentCl
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass-card p-6 border border-slate-200 dark:border-slate-700/40 flex justify-between items-center"
+        className="glass-card p-6 border border-slate-700/40 flex justify-between items-center"
       >
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">
+          <h1 className="text-3xl font-bold text-white mb-2">
             {assessment.title} <span className="neon-text-purple">Assessment</span>
           </h1>
-          <p className="text-slate-600 dark:text-slate-400 transition-colors">
+          <p className="text-slate-400">
             {questions.length} questions. You have {assessment.durationMins} minutes.
           </p>
         </div>
         <button 
           onClick={() => router.push("/assessment")}
-          className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+          className="text-slate-400 hover:text-white transition-colors"
         >
           Back to Menu
         </button>
@@ -164,13 +164,13 @@ export default function AssessmentClient({ assessment, questions }: AssessmentCl
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex flex-col items-center justify-center py-16 glass-card border border-slate-200 dark:border-slate-700/40 text-center"
+          className="flex flex-col items-center justify-center py-16 glass-card border border-slate-700/40 text-center"
         >
           <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 2.5, repeat: Infinity }}>
             <Clock className="w-16 h-16 text-slate-500 mb-6" />
           </motion.div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 transition-colors">Ready to begin?</h2>
-          <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-md transition-colors">
+          <h2 className="text-2xl font-bold text-white mb-4">Ready to begin?</h2>
+          <p className="text-slate-400 mb-8 max-w-md">
             {questions.length} multiple-choice questions for this chapter. The timer starts immediately and cannot be paused.
           </p>
           <motion.button
@@ -189,12 +189,12 @@ export default function AssessmentClient({ assessment, questions }: AssessmentCl
       {examStarted && !submitted && (
         <div className="space-y-5">
           {/* Timer & progress bar */}
-          <div className="sticky top-[68px] z-40 glass-card border border-slate-200 dark:border-slate-700/40 p-4 space-y-3">
+          <div className="sticky top-[68px] z-40 glass-card border border-slate-700/40 p-4 space-y-3">
             <div className="flex justify-between items-center">
-              <span className="font-semibold text-slate-900 dark:text-white text-sm transition-colors">
+              <span className="font-semibold text-white text-sm">
                 Question {currentQ + 1} of {questions.length}
               </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400 transition-colors">
+              <span className="text-xs text-slate-400">
                 {answeredCount}/{questions.length} answered
               </span>
               <div
@@ -208,7 +208,7 @@ export default function AssessmentClient({ assessment, questions }: AssessmentCl
                 {formatTime(timeLeft)}
               </div>
             </div>
-            <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full progress-neon"
                 animate={{ width: `${((currentQ + 1) / questions.length) * 100}%` }}
@@ -225,12 +225,12 @@ export default function AssessmentClient({ assessment, questions }: AssessmentCl
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -30 }}
               transition={{ duration: 0.3 }}
-              className="glass-card border border-slate-200 dark:border-slate-700/40 p-6 md:p-8"
+              className="glass-card border border-slate-700/40 p-6 md:p-8"
             >
               <span className="text-xs font-bold uppercase tracking-widest text-cyan-400 mb-3 block">
                 Question {currentQ + 1}
               </span>
-              <h3 className="text-xl text-slate-900 dark:text-white font-medium mb-6 leading-relaxed transition-colors">
+              <h3 className="text-xl text-white font-medium mb-6 leading-relaxed">
                 {questions[currentQ].text}
               </h3>
 
@@ -253,7 +253,7 @@ export default function AssessmentClient({ assessment, questions }: AssessmentCl
                       onChange={() => selectAnswer(oi)}
                       className="w-4 h-4 text-blue-500"
                     />
-                    <span className="text-slate-700 dark:text-slate-200 transition-colors">{opt}</span>
+                    <span className="text-slate-200">{opt}</span>
                   </motion.label>
                 ))}
               </div>
@@ -317,7 +317,7 @@ export default function AssessmentClient({ assessment, questions }: AssessmentCl
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="glass-card border border-slate-200 dark:border-slate-700/40 p-8 md:p-12 text-center space-y-6"
+          className="glass-card border border-slate-700/40 p-8 md:p-12 text-center space-y-6"
         >
           <motion.div
             initial={{ scale: 0 }}
@@ -327,11 +327,11 @@ export default function AssessmentClient({ assessment, questions }: AssessmentCl
             <Trophy className={`w-20 h-20 mx-auto ${displayPercent >= 70 ? "neon-text-green" : "neon-text-pink"}`} />
           </motion.div>
 
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white transition-colors">Assessment Complete!</h2>
+          <h2 className="text-3xl font-bold text-white">Assessment Complete!</h2>
           <div className="text-6xl font-bold neon-text-blue">{displayPercent}%</div>
-          <p className="text-slate-600 dark:text-slate-400 transition-colors">
-            You answered <strong className="text-slate-900 dark:text-white">{displayScore}</strong> out of{" "}
-            <strong className="text-slate-900 dark:text-white">{questions.length}</strong> correctly.
+          <p className="text-slate-400">
+            You answered <strong className="text-white">{displayScore}</strong> out of{" "}
+            <strong className="text-white">{questions.length}</strong> correctly.
           </p>
 
           {saveState === "saving" && (
@@ -367,7 +367,7 @@ export default function AssessmentClient({ assessment, questions }: AssessmentCl
                       <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                     )}
                     <div>
-                      <p className="text-slate-700 dark:text-slate-300 font-medium transition-colors">{q.text}</p>
+                      <p className="text-slate-300 font-medium">{q.text}</p>
                       {!correct && (
                         <p className="text-xs text-slate-500 mt-1">
                           Correct: <span className="text-emerald-400">{q.correctAnswer}</span>
