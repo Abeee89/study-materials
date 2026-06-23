@@ -46,53 +46,116 @@ export async function POST(req: Request) {
     // @ts-expect-error session.user.id is injected in auth callbacks
     const userId = session.user.id as string;
 
-    const assessment = await prisma.assessment.findUnique({
-      where: { id: assessmentId },
-      include: {
-        questions: {
-          orderBy: { id: "asc" }
-        }
-      }
-    });
-
-    if (!assessment) {
-      return NextResponse.json({ error: "Assessment not found" }, { status: 404 });
-    }
-
-    if (parsedAnswers.length !== assessment.questions.length) {
-      return NextResponse.json({ error: "Answers length does not match questions length" }, { status: 400 });
-    }
-
     let score = 0;
+    let total = 0;
+    let percent = 0;
+    let title = "";
+    let durationMins = 20;
+    let legacyAssessmentId = "";
+    let quizId: string | null = null;
     const incorrectQuestions: Array<{
       questionText: string;
       submittedAnswer: string | null;
       correctAnswer: string;
     }> = [];
 
-    assessment.questions.forEach((q, index) => {
-      const options = JSON.parse(q.options) as string[];
-      const answerIndex = parsedAnswers[index];
-      const submittedAnswer = answerIndex !== null ? options[answerIndex] : null;
-
-      if (submittedAnswer === q.correctAnswer) {
-        score += 1;
-      } else {
-        incorrectQuestions.push({
-          questionText: q.text,
-          submittedAnswer,
-          correctAnswer: q.correctAnswer
-        });
-      }
+    // Check if assessmentId matches a Quiz
+    const quiz = await prisma.quiz.findUnique({
+      where: { id: assessmentId },
+      include: {
+        subChapter: {
+          include: {
+            chapter: true,
+          },
+        },
+      },
     });
 
-    const total = assessment.questions.length;
-    const percent = Math.round((score / total) * 100);
+    if (quiz) {
+      quizId = quiz.id;
+      title = quiz.title;
+      const chapterOrder = quiz.subChapter.chapter.sortOrder;
+      const legacyAssessment = await prisma.assessment.findFirst({
+        where: { chapterOrder },
+      });
+      if (!legacyAssessment) {
+        return NextResponse.json({ error: "Associated legacy assessment not found" }, { status: 400 });
+      }
+      legacyAssessmentId = legacyAssessment.id;
+      durationMins = legacyAssessment.durationMins;
+
+      const rawQuestions = Array.isArray(quiz.questions) ? quiz.questions : [];
+      if (parsedAnswers.length !== rawQuestions.length) {
+        return NextResponse.json({ error: "Answers length does not match questions length" }, { status: 400 });
+      }
+
+      rawQuestions.forEach((q: any, index: number) => {
+        const qText = q.question || "";
+        const options = Array.isArray(q.options) ? q.options : [];
+        const correctAnswer = q.correct || q.correctAnswer || "";
+        const answerIndex = parsedAnswers[index];
+        const submittedAnswer = answerIndex !== null ? options[answerIndex] : null;
+
+        if (submittedAnswer === correctAnswer) {
+          score += 1;
+        } else {
+          incorrectQuestions.push({
+            questionText: qText,
+            submittedAnswer,
+            correctAnswer,
+          });
+        }
+      });
+
+      total = rawQuestions.length;
+      percent = Math.round((score / total) * 100);
+    } else {
+      const assessment = await prisma.assessment.findUnique({
+        where: { id: assessmentId },
+        include: {
+          questions: {
+            orderBy: { id: "asc" }
+          }
+        }
+      });
+
+      if (!assessment) {
+        return NextResponse.json({ error: "Assessment not found" }, { status: 404 });
+      }
+
+      title = assessment.title;
+      durationMins = assessment.durationMins;
+      legacyAssessmentId = assessment.id;
+
+      if (parsedAnswers.length !== assessment.questions.length) {
+        return NextResponse.json({ error: "Answers length does not match questions length" }, { status: 400 });
+      }
+
+      assessment.questions.forEach((q, index) => {
+        const options = JSON.parse(q.options) as string[];
+        const answerIndex = parsedAnswers[index];
+        const submittedAnswer = answerIndex !== null ? options[answerIndex] : null;
+
+        if (submittedAnswer === q.correctAnswer) {
+          score += 1;
+        } else {
+          incorrectQuestions.push({
+            questionText: q.text,
+            submittedAnswer,
+            correctAnswer: q.correctAnswer
+          });
+        }
+      });
+
+      total = assessment.questions.length;
+      percent = Math.round((score / total) * 100);
+    }
 
     const attempt = await prisma.assessmentAttempt.create({
       data: {
         userId,
-        assessmentId: assessment.id,
+        assessmentId: legacyAssessmentId,
+        quizId,
         score,
         timeSpentSecs: spent,
       },
@@ -109,11 +172,19 @@ export async function POST(req: Request) {
       };
 
       const quizContext = {
-        assessmentTitle: assessment.title,
-        durationMins: assessment.durationMins,
+        assessmentTitle: title,
+        durationMins,
       };
 
-      const ai = await generateLearningOutcomesFeedback({ attemptData, quizContext });
+      const allSubChapters = await prisma.subChapter.findMany({
+        select: {
+          id: true,
+          title: true,
+          objective: true,
+        },
+      });
+
+      const ai = await generateLearningOutcomesFeedback({ attemptData, quizContext, allSubChapters });
       feedback = ai.feedback;
 
       await prisma.aIAnalysis.create({

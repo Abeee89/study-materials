@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"STUDENT" | "TEACHER">("STUDENT");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +25,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, role }),
       });
 
       if (res.ok) {
@@ -112,6 +113,37 @@ export default function RegisterPage() {
                   className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 outline-none transition-all text-white placeholder-slate-500"
                   placeholder="student@example.com"
                 />
+              </div>
+            </div>
+
+            {/* Role Selection */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300">I am a...</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setRole("STUDENT")}
+                  className={`p-3 rounded-xl border text-center transition-all ${
+                    role === "STUDENT"
+                      ? "border-cyan-500 bg-cyan-500/10 text-white shadow-[0_0_15px_rgba(6,182,212,0.15)]"
+                      : "border-slate-700 bg-slate-900/30 text-slate-400 hover:border-slate-600 hover:text-slate-300"
+                  }`}
+                >
+                  <div className="text-sm font-bold">Student</div>
+                  <div className="text-[10px] mt-0.5 opacity-80">Learn & take quizzes</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole("TEACHER")}
+                  className={`p-3 rounded-xl border text-center transition-all ${
+                    role === "TEACHER"
+                      ? "border-blue-500 bg-blue-500/10 text-white shadow-[0_0_15px_rgba(59,130,246,0.15)]"
+                      : "border-slate-700 bg-slate-900/30 text-slate-400 hover:border-slate-600 hover:text-slate-300"
+                  }`}
+                >
+                  <div className="text-sm font-bold">Teacher</div>
+                  <div className="text-[10px] mt-0.5 opacity-80">Manage classes & track</div>
+                </button>
               </div>
             </div>
 

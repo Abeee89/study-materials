@@ -7,6 +7,7 @@ export type LearningOutcomesEvaluation = {
   needsImprovement: string[];
   summary: string;
   recommendedNextAction: string;
+  recommendedSubChapters: string[];
 };
 
 function extractFirstJsonObject(text: string): string | null {
@@ -36,6 +37,7 @@ function normalizeEvaluation(value: unknown): LearningOutcomesEvaluation | null 
   const summary = typeof obj.summary === "string" ? obj.summary.trim() : "";
   const recommendedNextAction =
     typeof obj.recommendedNextAction === "string" ? obj.recommendedNextAction.trim() : "";
+  const recommendedSubChapters = toStringArray(obj.recommendedSubChapters);
 
   if (!summary && strengths.length === 0 && needsImprovement.length === 0 && !recommendedNextAction) {
     return null;
@@ -46,16 +48,18 @@ function normalizeEvaluation(value: unknown): LearningOutcomesEvaluation | null 
     needsImprovement,
     summary,
     recommendedNextAction,
+    recommendedSubChapters,
   };
 }
 
 export async function generateLearningOutcomesFeedback(params: {
   attemptData: unknown;
   quizContext?: unknown;
+  allSubChapters?: Array<{ id: string; title: string; objective: string }>;
 }): Promise<{ feedback: string; parsed: LearningOutcomesEvaluation | null; raw: string }> {
   const systemInstruction = `You are an expert AI evaluator for a vocational high school platform teaching "Basic Electricity".
 
-Your task: generate a concise learning-outcomes review based ONLY on the provided attempt data.
+Your task: generate a concise learning-outcomes review based ONLY on the provided attempt data and suggest 1-2 lessons from the available lesson list that the student should study next.
 
 Strict rules:
 +- Stay within Basic Electricity topics (Ohm's Law, series/parallel, power/energy, safety, components).
@@ -66,8 +70,10 @@ Strict rules:
 +    "strengths": string[],
 +    "needsImprovement": string[],
 +    "summary": string,
-+    "recommendedNextAction": string
++    "recommendedNextAction": string,
++    "recommendedSubChapters": string[]
 +  }
++- In "recommendedSubChapters", only return an array of 1 to 2 exact subchapter IDs from the "Available Lessons to Recommend" list matching the areas of difficulty.
 +- Write in English. No greetings or pleasantries.
 
 Allowed site feature references for recommendedNextAction:
@@ -77,7 +83,7 @@ Allowed site feature references for recommendedNextAction:
 +- Circuit Sandbox (series/parallel practice)
 `;
 
-  const userContent = `Quiz Context (JSON): ${JSON.stringify(params.quizContext ?? null)}\n\nStudent Attempt Data (JSON): ${JSON.stringify(params.attemptData)}`;
+  const userContent = `Available Lessons to Recommend (JSON): ${JSON.stringify(params.allSubChapters ?? [])}\n\nQuiz Context (JSON): ${JSON.stringify(params.quizContext ?? null)}\n\nStudent Attempt Data (JSON): ${JSON.stringify(params.attemptData)}`;
 
   const messages: OpenRouterChatMessage[] = [
     { role: "system", content: systemInstruction },

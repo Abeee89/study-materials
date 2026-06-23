@@ -9,7 +9,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
 
-    const { name, email, password } = rawBody as Record<string, unknown>;
+    const { name, email, password, role } = rawBody as Record<string, unknown>;
 
     if (typeof name !== "string" || typeof email !== "string" || typeof password !== "string") {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -30,6 +30,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Password must be between 6 and 128 characters" }, { status: 400 });
     }
 
+    const validatedRole = role === "TEACHER" ? "TEACHER" : "STUDENT";
+
     const existingUser = await prisma.user.findUnique({
       where: { email: trimmedEmail },
     });
@@ -45,7 +47,7 @@ export async function POST(req: Request) {
         name: trimmedName,
         email: trimmedEmail,
         password: hashedPassword,
-        role: "STUDENT",
+        role: validatedRole,
       },
     });
 

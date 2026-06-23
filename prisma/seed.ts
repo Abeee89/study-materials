@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 const chapters = [
   {
     id: "ch1",
-    title: "Chapter 1: Basic Concepts of Matter and Atoms",
+    title: "Chapter 1: Foundations of Matter & Charge",
     description: "Explore the atomic foundations of electrical phenomena — matter, elements, and free electron theory.",
     sortOrder: 1,
     colorKey: "cyan",
@@ -19,6 +19,7 @@ const chapters = [
         id: "ch1-s1",
         title: "Matter, Elements, and Molecules",
         objective: "Understand the fundamental definitions of matter, elements, and molecules.",
+        contentType: MediaType.TEXT,
         contentBody: "Matter is anything that has mass and occupies space. An element is a pure substance consisting of only one type of atom, such as copper or gold. Molecules are formed when two or more atoms bond together chemically. Understanding these building blocks is essential before diving into how electrical phenomena occur at the atomic level.",
         source: "Basic Physics for Electronics",
         sortOrder: 1,
@@ -27,6 +28,7 @@ const chapters = [
         id: "ch1-s2",
         title: "Atomic Structure",
         objective: "Identify the components of an atom: Protons, Neutrons, and Electrons.",
+        contentType: MediaType.TEXT,
         contentBody: "Atoms consist of a central nucleus containing positively charged protons and neutral neutrons, surrounded by negatively charged electrons orbiting in various shells. In neutral atoms, the number of protons equals the number of electrons. The outermost shell, known as the valence shell, dictates the electrical and chemical properties of the atom.",
         source: "Basic Physics for Electronics",
         sortOrder: 2,
@@ -35,6 +37,7 @@ const chapters = [
         id: "ch1-s3",
         title: "Free Electron Theory & Electric Charge",
         objective: "Explain how free electrons produce electric current and define Electric Charge (Q).",
+        contentType: MediaType.TEXT,
         contentBody: "Electrons in the outermost shell that are loosely bound to the nucleus can easily break free; these are called free electrons. The movement of these free electrons from atom to atom creates an electric current. Electric charge (Q) is a fundamental property of matter, measured in Coulombs (C). One Coulomb is equivalent to the charge of approximately 6.242 × 10¹⁸ electrons.",
         source: "Thomas L. Floyd, 'Principles of Electric Circuits'",
         sortOrder: 3,
@@ -43,7 +46,7 @@ const chapters = [
   },
   {
     id: "ch2",
-    title: "Chapter 2: Types of Electrical Materials",
+    title: "Chapter 2: Classifications of Engineering Materials",
     description: "Understand the three categories of electrical materials: conductors, insulators, and semiconductors.",
     sortOrder: 2,
     colorKey: "blue",
@@ -54,6 +57,7 @@ const chapters = [
         id: "ch2-s1",
         title: "Conductors",
         objective: "Identify materials that conduct electricity well.",
+        contentType: MediaType.TEXT,
         contentBody: "Conductors are materials that allow electric current to flow easily. This is because they have many free electrons in their valence shells (typically 1 to 3 electrons). Common examples include copper, aluminum, silver, and gold. Copper is the most widely used conductor in electrical wiring due to its excellent conductivity and affordability.",
         source: "Materials Science in Electrical Engineering",
         sortOrder: 1,
@@ -62,6 +66,7 @@ const chapters = [
         id: "ch2-s2",
         title: "Insulators",
         objective: "Identify materials that inhibit the flow of electricity.",
+        contentType: MediaType.TEXT,
         contentBody: "Insulators are materials that resist the flow of electric current. Their valence electrons (typically 5 to 8) are tightly bound to the atomic nucleus, leaving very few free electrons available for conduction. Common examples include rubber, plastic, glass, ceramics, and PVC (Polyvinyl Chloride), which is widely used to coat electrical wires for safety.",
         source: "Materials Science in Electrical Engineering",
         sortOrder: 2,
@@ -70,6 +75,7 @@ const chapters = [
         id: "ch2-s3",
         title: "Semiconductors",
         objective: "Understand materials that can act as both conductors and insulators.",
+        contentType: MediaType.TEXT,
         contentBody: "Semiconductors have electrical properties between those of conductors and insulators (typically 4 valence electrons). Under certain conditions, such as changes in temperature or the addition of impurities (doping), they can conduct electricity. Silicon and germanium are the most common semiconductors and are the foundational raw materials for creating modern electronic components like diodes, transistors, and integrated circuits.",
         source: "Boylestad & Nashelsky, 'Electronic Devices and Circuit Theory'",
         sortOrder: 3,
@@ -78,7 +84,7 @@ const chapters = [
   },
   {
     id: "ch3",
-    title: "Chapter 3: Basic Electrical Quantities and Characteristics",
+    title: "Chapter 3: Core Electrodynamic Quantities",
     description: "Master the fundamental electrical quantities: voltage, current, resistance, and power.",
     sortOrder: 3,
     colorKey: "purple",
@@ -87,34 +93,47 @@ const chapters = [
     subChapters: [
       {
         id: "ch3-s1",
-        title: "Voltage (V) & Current (I)",
-        objective: "Define electric voltage and current.",
-        contentBody: "Electric Voltage (V), or potential difference, is the electrical pressure or force that drives free electrons to move through a conductor, measured in Volts. Electric Current (I) is the rate at which this electric charge flows past a point in a circuit over time, measured in Amperes (A). Without voltage, current cannot flow.",
+        title: "Voltage and Potential Difference Mechanics",
+        objective: "Define electric voltage and potential difference.",
+        contentType: MediaType.TEXT,
+        contentBody: "Electric Voltage (V), or potential difference, is the electrical pressure or force that drives free electrons to move through a conductor, measured in Volts. It represents the energy per unit charge needed to move a charge between two points. Without a potential difference, no net movement of electric charge (current) can occur.",
         source: "Thomas L. Floyd, 'Principles of Electric Circuits'",
         sortOrder: 1,
       },
       {
         id: "ch3-s2",
-        title: "Resistance (R) & Power (P)",
-        objective: "Define electrical resistance and power.",
-        contentBody: "Resistance (R) is the property of a material that opposes or inhibits the flow of electric current, measured in Ohms (Ω). All materials have some resistance, except superconductors. Electric Power (P) is the rate at which electrical energy is consumed or generated by a circuit component, measured in Watts (W).",
+        title: "Current Flow Dynamics and Ampere Scales",
+        objective: "Define electric current and understand Ampere scales.",
+        contentType: MediaType.VIDEO,
+        contentBody: "Electric Current (I) is the rate at which electric charge flows past a point in a circuit, measured in Amperes (A). One Ampere corresponds to one Coulomb of charge flowing through a cross-section of a conductor in one second. Conventional current is defined as the flow of positive charges, which is opposite to the actual physical direction of electron flow.",
+        mediaUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
         source: "Thomas L. Floyd, 'Principles of Electric Circuits'",
         sortOrder: 2,
       },
       {
         id: "ch3-s3",
-        title: "Direct Current (DC) vs Alternating Current (AC)",
-        objective: "Differentiate between DC and AC currents.",
-        contentBody: "Direct Current (DC) flows continuously in one constant direction; it is typically supplied by batteries, solar panels, and DC power supplies. Alternating Current (AC) periodically reverses its direction of flow and changes its magnitude over time, typically in a sine wave pattern. AC is the standard type of electricity delivered to homes and businesses by power grids.",
+        title: "Impedance, Resistance, and Thermal Dissipation",
+        objective: "Understand electrical resistance and thermal dissipation.",
+        contentType: MediaType.TEXT,
+        contentBody: "Resistance (R) is the property of a material that opposes or inhibits the flow of electric current, measured in Ohms (Ω). As electrons flow through a conductor, they collide with the atoms of the material, causing electrical energy to be dissipated as heat. This heat generation is known as thermal dissipation and is a key factor in electrical safety and efficiency.",
         source: "Fundamental Electrical Engineering",
         sortOrder: 3,
+      },
+      {
+        id: "ch3-s4",
+        title: "Electrical Joule Power and Work Equations",
+        objective: "Define electrical power and work equations.",
+        contentType: MediaType.TEXT,
+        contentBody: "Electric Power (P) is the rate at which electrical energy is consumed or generated by a circuit component, measured in Watts (W). Joule's Law states that the power dissipated in a resistor is proportional to the square of the current passing through it: P = I²R. It can also be calculated as the product of Voltage and Current: P = V × I.",
+        source: "Thomas L. Floyd, 'Principles of Electric Circuits'",
+        sortOrder: 4,
       },
     ],
   },
   {
     id: "ch4",
-    title: "Chapter 4: Basic Laws of Electricity",
-    description: "Learn Ohm's Law, Joule's Power Law, and Kirchhoff's circuit laws.",
+    title: "Chapter 4: Fundamental System Laws",
+    description: "Learn Ohm's Law and Joule's Power Law for multi-variable power intersections.",
     sortOrder: 4,
     colorKey: "pink",
     level: "intermediate",
@@ -122,34 +141,29 @@ const chapters = [
     subChapters: [
       {
         id: "ch4-s1",
-        title: "Ohm's Law & Power Law",
-        objective: "Explain the linear relationship between V, I, R, and Power.",
-        contentBody: "Ohm's Law states that Voltage (V) equals Current (I) multiplied by Resistance (R): V = I × R. This defines the fundamental linear relationship in DC circuits. The Power Law (or Joule's Law) calculates electrical power (P) as the product of Voltage and Current: P = V × I. These two laws can be combined to find P = I²R or P = V²/R.",
+        title: "Mathematical Proofs of Ohm's Law (V=IR)",
+        objective: "Explain the linear relationship between V, I, and R.",
+        contentType: MediaType.TEXT,
+        contentBody: "Ohm's Law states that Voltage (V) equals Current (I) multiplied by Resistance (R): V = I × R. This defines the fundamental linear relationship in DC circuits, showing that current is directly proportional to voltage and inversely proportional to resistance. This law forms the basis of all circuit analysis.",
         source: "Thomas L. Floyd, 'Principles of Electric Circuits'",
         sortOrder: 1,
       },
       {
         id: "ch4-s2",
-        title: "Kirchhoff's Current Law (KCL)",
-        objective: "Understand KCL regarding the branching of current.",
-        contentBody: "Kirchhoff's Current Law (KCL) states that the total current entering a junction or node in a circuit must exactly equal the total current leaving that node (Σ I_in = Σ I_out). This is based on the principle of conservation of electric charge, meaning charge cannot be created or destroyed at a junction.",
+        title: "Watt's Law for Multi-Variable Power Intersections",
+        objective: "Use Watt's Law to calculate power in terms of voltage, current, and resistance.",
+        contentType: MediaType.VIDEO,
+        contentBody: "Watt's Law calculates electrical power (P) as the product of Voltage and Current: P = V × I. By integrating Ohm's Law, we can express power in multiple ways: P = I²R or P = V²/R. This helps engineers calculate power dissipation and trace load conditions across multi-variable component junctions.",
+        mediaUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
         source: "Robert L. Boylestad, 'Introductory Circuit Analysis'",
         sortOrder: 2,
-      },
-      {
-        id: "ch4-s3",
-        title: "Kirchhoff's Voltage Law (KVL)",
-        objective: "Understand KVL regarding total voltage in a closed loop.",
-        contentBody: "Kirchhoff's Voltage Law (KVL) states that the algebraic sum of all voltages around any closed loop in a circuit must equal zero (Σ V = 0). This means that the total voltage supplied by the source must equal the sum of the voltage drops across all components in that loop, reflecting the conservation of energy.",
-        source: "Robert L. Boylestad, 'Introductory Circuit Analysis'",
-        sortOrder: 3,
       },
     ],
   },
   {
     id: "ch5",
-    title: "Chapter 5: Series, Parallel, and Mixed Circuits",
-    description: "Analyze and simplify series, parallel, and combination circuit topologies.",
+    title: "Chapter 5: Network Topology Concepts",
+    description: "Analyze series, parallel, and complex compound mesh networks.",
     sortOrder: 5,
     colorKey: "green",
     level: "mastery",
@@ -157,25 +171,29 @@ const chapters = [
     subChapters: [
       {
         id: "ch5-s1",
-        title: "Series Circuits",
+        title: "Series Topologies and Loop Resistances",
         objective: "Analyze voltage and current in series configurations.",
+        contentType: MediaType.TEXT,
         contentBody: "In a series circuit, there is only one path for current. Therefore, the current (I) is exactly the same at every point. However, the total voltage divides across each component (voltage divider characteristic). The total resistance is simply the sum of all individual resistances: R_total = R₁ + R₂ + R₃ + ...",
         source: "Robert L. Boylestad, 'Introductory Circuit Analysis'",
         sortOrder: 1,
       },
       {
         id: "ch5-s2",
-        title: "Parallel Circuits",
-        objective: "Analyze voltage and current in parallel configurations.",
-        contentBody: "In a parallel circuit, there are multiple branches for current to flow. Therefore, the total current divides among the branches (current divider characteristic). However, the voltage (V) is identical across every parallel branch. The total equivalent resistance is calculated as: 1/R_total = 1/R₁ + 1/R₂ + 1/R₃ + ...",
+        title: "Parallel Topologies and Kirchhoff's Current Laws",
+        objective: "Analyze voltage, current, and KCL in parallel configurations.",
+        contentType: MediaType.VIDEO,
+        contentBody: "In a parallel circuit, there are multiple branches for current to flow. Therefore, the total current divides among the branches (current divider characteristic). However, the voltage (V) is identical across every parallel branch. Kirchhoff's Current Law (KCL) states that the total current entering a junction or node in a circuit must exactly equal the total current leaving that node: Σ I_in = Σ I_out.",
+        mediaUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
         source: "Robert L. Boylestad, 'Introductory Circuit Analysis'",
         sortOrder: 2,
       },
       {
         id: "ch5-s3",
-        title: "Mixed Circuits (Combination)",
+        title: "Complex Compound Mesh Networks",
         objective: "Simplify and analyze series-parallel combination circuits.",
-        contentBody: "Mixed circuits contain both series and parallel sections. Analyzing them involves breaking the circuit down into simpler parts. You first identify pure series or pure parallel branches, calculate their equivalent resistances, and redraw the simplified circuit. You repeat this process until you have a single equivalent total resistance.",
+        contentType: MediaType.TEXT,
+        contentBody: "Mixed circuits contain both series and parallel sections. Analyzing them involves breaking the circuit down into simpler parts. You first identify pure series or pure parallel branches, calculate their equivalent resistances, and redraw the simplified circuit. Kirchhoff's Voltage Law (KVL) is also used to verify that the algebraic sum of voltages in any closed loop is zero.",
         source: "Robert L. Boylestad, 'Introductory Circuit Analysis'",
         sortOrder: 3,
       },
@@ -183,8 +201,8 @@ const chapters = [
   },
   {
     id: "ch6",
-    title: "Chapter 6: Basic Electrical Installation",
-    description: "Study residential installation components, diagrams, and Indonesian safety standards (PUIL).",
+    title: "Chapter 6: Practical Residential & Industrial Installations",
+    description: "Study residential installation components, grounding, single-phase distribution, and PUIL standards.",
     sortOrder: 6,
     colorKey: "cyan",
     level: "mastery",
@@ -192,34 +210,29 @@ const chapters = [
     subChapters: [
       {
         id: "ch6-s1",
-        title: "Installation Components",
-        objective: "Familiarize with common electrical installation components.",
-        contentBody: "Common components in household installations include switches (single switches to control one light, series switches to control multiple lights independently), sockets (receptacles for appliances), light fittings (housings for bulbs), and PHB (Perlengkapan Hubung Bagi) or distribution boards containing protection devices like MCBs (Miniature Circuit Breakers).",
+        title: "Protective Elements, Circuit Breakers, and Grounding",
+        objective: "Understand safety devices and grounding in electrical installations.",
+        contentType: MediaType.PDF,
+        contentBody: "Common protective components in household and industrial installations include switches, sockets, distribution boards, MCBs (Miniature Circuit Breakers) for overcurrent protection, grounding rods, and Earth Leakage Circuit Breakers (ELCBs) to prevent electrical fires and protect human life.",
+        mediaUrl: "/documents/protective_elements_guide.pdf",
         source: "SNI 0225:2011 (PUIL 2011)",
         sortOrder: 1,
       },
       {
         id: "ch6-s2",
-        title: "Symbols and Diagrams",
-        objective: "Read and create basic installation diagrams.",
-        contentBody: "Electrical planning uses standard symbols. A Single Line Diagram (SLD) simplifies a complex system by showing power paths using a single line, rather than showing all individual wires. A Wiring Diagram shows the actual physical connections, routing, and wire counts (Live, Neutral, Ground) between all components.",
+        title: "Single-Phase Distribution and Wire Sizing",
+        objective: "Explain single-phase distribution and how to choose appropriate wire sizes based on PUIL standards.",
+        contentType: MediaType.TEXT,
+        contentBody: "Single-phase distribution delivers electricity via two wires (live and neutral) or three wires (live, neutral, and ground) to residential consumers. Selecting the correct wire gauge (sizing) is crucial to prevent overheating and power losses, following safety standards like PUIL. Standard symbols and Single Line Diagrams (SLD) are used to design and outline wire routing layouts.",
         source: "SNI 0225:2011 (PUIL 2011)",
         sortOrder: 2,
-      },
-      {
-        id: "ch6-s3",
-        title: "K3 & PUIL Standards",
-        objective: "Understand occupational safety and general installation requirements.",
-        contentBody: "K3 (Kesehatan dan Keselamatan Kerja) in electricity focuses on preventing electric shocks, burns, and electrical fires. PUIL (Persyaratan Umum Instalasi Listrik) is the Indonesian standard governing how installations must be designed, implemented, and maintained to ensure safety, reliability, and proper functionality.",
-        source: "SNI 0225:2011 (PUIL 2011)",
-        sortOrder: 3,
       },
     ],
   },
   {
     id: "ch7",
-    title: "Chapter 7: Basic Electronics and Optical Applications",
-    description: "Explore passive and active electronic components, diodes, transistors, and optoelectronics.",
+    title: "Chapter 7: Active Electronics & Optoelectronics",
+    description: "Explore passive and active electronic components, diodes, transistors, and optoelectronic applications.",
     sortOrder: 7,
     colorKey: "blue",
     level: "mastery",
@@ -229,23 +242,27 @@ const chapters = [
         id: "ch7-s1",
         title: "Passive Electronic Components",
         objective: "Identify Resistors, Capacitors, and Inductors and their applications.",
-        contentBody: "Passive components do not generate power or amplify signals. Resistors limit current and act as voltage dividers. Capacitors store energy in an electric field and block DC while passing AC, making them useful in filters. Inductors store energy in a magnetic field and are used in chokes, transformers, and frequency filters.",
+        contentType: MediaType.TEXT,
+        contentBody: "Passive components do not generate power or amplify signals. Resistors limit current and act as voltage dividers. Capacitors store energy in an electric field and block DC while passing AC. Inductors store energy in a magnetic field.",
         source: "Boylestad & Nashelsky, 'Electronic Devices and Circuit Theory'",
         sortOrder: 1,
       },
       {
         id: "ch7-s2",
-        title: "Active Electronic Components",
-        objective: "Understand Diodes and Transistors.",
-        contentBody: "Active components can control current flow. Diodes allow current to flow in only one direction and are heavily used as rectifiers to convert AC to DC. Transistors (like BJTs and MOSFETs) use a small input current or voltage to control a large output current, allowing them to act as fast electronic switches or signal amplifiers.",
+        title: "PN-Junction Diodes and Signal Rectifiers",
+        objective: "Explain how diodes function and their application in rectification.",
+        contentType: MediaType.TEXT,
+        contentBody: "Diodes allow current to flow in only one direction. They are heavily used as rectifiers to convert alternating current (AC) to direct current (DC), turning a fluctuating signal into a steady, constant power source.",
         source: "Boylestad & Nashelsky, 'Electronic Devices and Circuit Theory'",
         sortOrder: 2,
       },
       {
         id: "ch7-s3",
-        title: "Optical Electronics (Optoelectronics)",
+        title: "Optoelectronic Transducers, LEDs, and Photodetectors",
         objective: "Learn about light-interacting electronic components.",
-        contentBody: "Optoelectronic devices interact with light. LEDs (Light-Emitting Diodes) emit light when forward-biased. LDRs (Light-Dependent Resistors) change their resistance based on ambient light levels, acting as light sensors. Photodiodes convert light into current. Optocouplers transfer electrical signals between isolated circuits using light, preventing high-voltage damage.",
+        contentType: MediaType.VIDEO,
+        contentBody: "Optoelectronic devices interact with light. LEDs (Light-Emitting Diodes) emit light when forward-biased. LDRs (Light-Dependent Resistors) change their resistance based on ambient light levels, acting as light sensors. Photodiodes convert light into current.",
+        mediaUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
         source: "Boylestad & Nashelsky, 'Electronic Devices and Circuit Theory'",
         sortOrder: 3,
       },
@@ -253,6 +270,7 @@ const chapters = [
         id: "ch7-s4",
         title: "Simple Circuit Practice",
         objective: "Apply component knowledge to create small practical projects.",
+        contentType: MediaType.TEXT,
         contentBody: "Combining these components allows for practical projects. For example, connecting an LDR to a transistor's base can create an automatic night-light circuit that turns on an LED when it gets dark. Using a transformer, diodes (bridge rectifier), and a capacitor can create a simple AC-to-DC power supply adapter.",
         source: "Practical Electronics for Inventors",
         sortOrder: 4,
@@ -261,7 +279,7 @@ const chapters = [
   },
 ];
 
-// ─── Assessment Data (kept from original seed) ────────────────────────────
+// ─── Assessment Data ────────────────────────────────────────────────────────
 
 const assessments = [
   {
@@ -394,11 +412,20 @@ async function main() {
       create: { id: chapterData.id, title: chapterData.title, description: chapterData.description, sortOrder: chapterData.sortOrder, colorKey: chapterData.colorKey, level: chapterData.level, iconKey: chapterData.iconKey },
     });
 
+    // Delete subchapters not present in the new set to handle reorganizations
+    const currentSubIds = subChapters.map(s => s.id);
+    await prisma.subChapter.deleteMany({
+      where: {
+        chapterId: chapter.id,
+        id: { notIn: currentSubIds }
+      }
+    });
+
     for (const sub of subChapters) {
       await prisma.subChapter.upsert({
         where: { id: sub.id },
-        update: { title: sub.title, objective: sub.objective, contentBody: sub.contentBody, source: sub.source, sortOrder: sub.sortOrder },
-        create: { id: sub.id, chapterId: chapter.id, title: sub.title, objective: sub.objective, contentType: MediaType.TEXT, contentBody: sub.contentBody, source: sub.source, sortOrder: sub.sortOrder },
+        update: { title: sub.title, objective: sub.objective, contentBody: sub.contentBody, contentType: sub.contentType, mediaUrl: sub.mediaUrl, source: sub.source, sortOrder: sub.sortOrder },
+        create: { id: sub.id, chapterId: chapter.id, title: sub.title, objective: sub.objective, contentType: sub.contentType, contentBody: sub.contentBody, mediaUrl: sub.mediaUrl, source: sub.source, sortOrder: sub.sortOrder },
       });
     }
 
@@ -425,6 +452,45 @@ async function main() {
     }
 
     console.log(`  ✅ ${upserted.title} (${questions.length} questions)`);
+  }
+
+  // 4. SubChapter Quizzes
+  console.log("\n⚡ Seeding subchapter quizzes...");
+  const lastSubChapterIdMap: Record<number, string> = {
+    1: "ch1-s3",
+    2: "ch2-s3",
+    3: "ch3-s4",
+    4: "ch4-s2",
+    5: "ch5-s3",
+    6: "ch6-s2",
+    7: "ch7-s4",
+  };
+
+  for (const assessment of assessments) {
+    const lastSubId = lastSubChapterIdMap[assessment.chapterOrder];
+    if (!lastSubId) continue;
+
+    const quizQuestions = assessment.questions.map((q) => ({
+      id: q.id,
+      question: q.text,
+      options: q.options,
+      correct: q.correctAnswer,
+    }));
+
+    const quiz = await prisma.quiz.upsert({
+      where: { subChapterId: lastSubId },
+      update: {
+        title: assessment.title,
+        questions: quizQuestions,
+      },
+      create: {
+        id: assessment.id.replace("-assessment", "-quiz"), // e.g. ch1-quiz
+        subChapterId: lastSubId,
+        title: assessment.title,
+        questions: quizQuestions,
+      },
+    });
+    console.log(`  ✅ Quiz: ${quiz.title} linked to SubChapter ${lastSubId}`);
   }
 
   console.log("\n🎉 Seeding complete!");

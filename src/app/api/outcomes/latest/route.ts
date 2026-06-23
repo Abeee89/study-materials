@@ -25,6 +25,7 @@ export async function GET() {
             questions: true,
           },
         },
+        quiz: true,
       },
     });
 
@@ -32,14 +33,24 @@ export async function GET() {
       return NextResponse.json({ attempt: null, analysis: null }, { status: 200 });
     }
 
-    const total = latestAttempt.assessment.questions.length || 1;
+    let total = latestAttempt.assessment.questions.length || 1;
+    let title = latestAttempt.assessment.title;
+
+    if (latestAttempt.quiz) {
+      const quizQuestions = Array.isArray(latestAttempt.quiz.questions)
+        ? latestAttempt.quiz.questions
+        : [];
+      total = quizQuestions.length || 1;
+      title = latestAttempt.quiz.title;
+    }
+
     const percent = Math.round((latestAttempt.score / total) * 100);
 
     return NextResponse.json(
       {
         attempt: {
           id: latestAttempt.id,
-          assessmentTitle: latestAttempt.assessment.title,
+          assessmentTitle: title,
           score: latestAttempt.score,
           total,
           percent,
