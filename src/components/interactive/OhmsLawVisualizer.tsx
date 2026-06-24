@@ -1,12 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Battery, Zap, AlertTriangle } from "lucide-react";
 
 export function OhmsLawVisualizer() {
   const [voltage, setVoltage] = useState(12); // V
   const [resistance, setResistance] = useState(2); // R
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).__antigravityContext = {
+        chapterTitle: "Core Electrodynamic Quantities",
+        subChapterTitle: "Ohm's Law",
+        simulationState: {
+          voltage,
+          resistance,
+          current: voltage / resistance,
+          moduleName: "Ohm's Law Visualizer",
+        },
+      };
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        (window as any).__antigravityContext = undefined;
+      }
+    };
+  }, [voltage, resistance]);
   // I = V / R
   const current = voltage / resistance;
 

@@ -12,7 +12,7 @@ export type OpenRouterChatOptions = {
 };
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-export const OPENROUTER_MODEL = "openai/gpt-oss-120b:free";
+export const OPENROUTER_MODEL = "openrouter/free";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object";

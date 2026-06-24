@@ -171,9 +171,32 @@ export async function POST(req: Request) {
         incorrectQuestions,
       };
 
+      let chapterTitle = "";
+      let subChapterTitle = "";
+      let subChapterObjective = "";
+
+      if (quiz) {
+        chapterTitle = quiz.subChapter.chapter.title;
+        subChapterTitle = quiz.subChapter.title;
+        subChapterObjective = quiz.subChapter.objective || "";
+      } else {
+        const legacyAssessmentObj = await prisma.assessment.findUnique({
+          where: { id: assessmentId }
+        });
+        if (legacyAssessmentObj) {
+          const chapter = await prisma.chapter.findFirst({
+            where: { sortOrder: legacyAssessmentObj.chapterOrder },
+          });
+          chapterTitle = chapter?.title || "";
+        }
+      }
+
       const quizContext = {
         assessmentTitle: title,
         durationMins,
+        chapterTitle,
+        subChapterTitle,
+        subChapterObjective,
       };
 
       const allSubChapters = await prisma.subChapter.findMany({

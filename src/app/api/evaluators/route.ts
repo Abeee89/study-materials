@@ -22,7 +22,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "OpenRouter API key not configured" }, { status: 500 });
     }
 
-    const { feedback } = await generateLearningOutcomesFeedback({ attemptData, quizContext });
+    const allSubChapters = await prisma.subChapter.findMany({
+      select: {
+        id: true,
+        title: true,
+        objective: true,
+      },
+    });
+
+    const { feedback } = await generateLearningOutcomesFeedback({
+      attemptData,
+      quizContext,
+      allSubChapters,
+    });
     return NextResponse.json({ analysis: feedback });
   } catch (error) {
     console.error("Evaluator API Error:", error);

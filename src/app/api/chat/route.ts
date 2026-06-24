@@ -1,72 +1,114 @@
-import { NextResponse } from "next/server";
-import { openRouterChatCompletion, type OpenRouterChatMessage } from "@/lib/openrouter";
-
-type ChatMessage = {
-  role: "user" | "ai";
-  content: string;
-};
-
-type ChatRequestBody = {
-  messages: ChatMessage[];
-  context?: string;
-};
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    const rawBody: unknown = await req.json();
-    if (!rawBody || typeof rawBody !== "object") {
-      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    const { messages, context } = await req.json();
+
+    const provider = process.env.AI_PROVIDER || "openrouter";
+    let url = "https://openrouter.ai/api/v1/chat/completions";
+    let apiKey = process.env.OPENROUTER_API_KEY || "";
+    let modelName = process.env.OPENROUTER_MODEL || "openrouter/free";
+
+    if (provider === "vercel-ai") {
+      url = process.env.VERCEL_AI_GATEWAY_URL || "https://api.openai.com/v1/chat/completions";
+      apiKey = process.env.OPENAI_API_KEY || "";
+      modelName = process.env.VERCEL_AI_MODEL || "gpt-4o-mini";
     }
 
-    const { messages, context } = rawBody as Partial<ChatRequestBody>;
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json({ error: "Messages are required" }, { status: 400 });
+    const { chapterTitle, subChapterTitle, subChapterObjective, simulationState } = context || {};
+
+    let contextPrompt = "You are a helpful AI Assistant for the Antigravity learning platform, guiding vocational high school students in Basic Electricity.";
+    if (chapterTitle || subChapterTitle) {
+      contextPrompt += `\nThe student is currently studying Chapter: "${chapterTitle || "Unknown"}", SubChapter: "${subChapterTitle || "Unknown"}".`;
+      if (subChapterObjective) {
+        contextPrompt += `\nLearning Objective: "${subChapterObjective}".`;
+      }
     }
-
-    if (!process.env.OPENROUTER_API_KEY) {
-      return NextResponse.json({ error: "OpenRouter API key not configured" }, { status: 500 });
+    if (simulationState) {
+      contextPrompt += `\nInteractive Simulation state: ${JSON.stringify(simulationState)}. Use this state to help explain concepts or guide the student's experimentation.`;
     }
+    contextPrompt += `\n\nBe educational, clear, concise, and encourage hands-on practice. Stick to electrical engineering and basic physics. Do not give direct answers immediately; guide them to think.`;
 
-    const systemInstruction = `You are a helpful, expert AI tutor for a vocational high school platform teaching "Basic Electricity".
-Current Page Context: ${context || "None provided."}
-
-Rules:
-- Stay strictly within Basic Electricity topics covered on this site: Ohm's Law, basic units, series & parallel circuits, power & energy, circuit safety (MCB/RCD/earthing), and basic passive/active components (resistor/diode/transistor basics).
-- You may also guide the student on how to use this site (Materials, Simulation Hub, Circuit Sandbox, Assessment, Outcomes).
-- If the student asks about unrelated topics, briefly refuse and redirect to an allowed Basic Electricity topic.
-- Address the student as "student".
-- Keep answers concise, educational, and actionable.`;
-
-    const sanitized = messages.flatMap((m): ChatMessage[] => {
-      if (!m || typeof m !== "object") return [];
-      const { role, content } = m as Partial<ChatMessage>;
-      if ((role !== "user" && role !== "ai") || typeof content !== "string") return [];
-      const trimmed = content.trim();
-      if (!trimmed) return [];
-      return [{ role, content: trimmed }];
+    const apiResponse = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: modelName,
+        messages: [
+          { role: "system", content: contextPrompt },
+          ...messages.map((m: any) => ({ role: m.role, content: m.content })),
+        ],
+        stream: true,
+        max_tokens: 1000,
+      }),
     });
 
-    if (sanitized.length === 0) {
-      return NextResponse.json({ error: "Messages are required" }, { status: 400 });
+    if (!apiResponse.ok) {
+      const errBody = await apiResponse.text();
+      console.error(`Provider error (${apiResponse.status}):`, errBody);
+      throw new Error(`AI Provider returned error status ${apiResponse.status}`);
     }
 
-    const openRouterMessages: OpenRouterChatMessage[] = [
-      { role: "system", content: systemInstruction },
-      ...sanitized.slice(-20).map<OpenRouterChatMessage>((m) => ({
-        role: m.role === "ai" ? "assistant" : "user",
-        content: m.content,
-      })),
-    ];
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
 
-    const reply = await openRouterChatCompletion({
-      messages: openRouterMessages,
-      temperature: 0.2,
-      maxTokens: 450,
+    const stream = new ReadableStream({
+      async start(controller) {
+        if (!apiResponse.body) {
+          controller.close();
+          return;
+        }
+        const reader = apiResponse.body.getReader();
+        let buffer = "";
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
+
+            for (const line of lines) {
+              const cleaned = line.trim();
+              if (!cleaned || cleaned === "data: [DONE]") continue;
+
+              if (cleaned.startsWith("data: ")) {
+                try {
+                  const data = JSON.parse(cleaned.slice(6));
+                  const text = data.choices?.[0]?.delta?.content;
+                  if (text) {
+                    controller.enqueue(encoder.encode(text));
+                  }
+                } catch (e) {
+                  // Partial or malformed SSE line, ignore and continue
+                }
+              }
+            }
+          }
+        } catch (err) {
+          controller.error(err);
+        } finally {
+          controller.close();
+        }
+      },
     });
 
-    return NextResponse.json({ reply });
-  } catch (error) {
-    console.error("Chat API Error:", error);
-    return NextResponse.json({ error: "Failed to generate reply" }, { status: 500 });
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Transfer-Encoding": "chunked",
+      },
+    });
+  } catch (error: any) {
+    console.error("Chat API error:", error);
+    return new Response(JSON.stringify({ error: error.message || "Internal server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

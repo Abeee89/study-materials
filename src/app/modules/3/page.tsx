@@ -14,7 +14,7 @@ export default function Module3Page() {
           </h3>
           <ul className="list-disc list-inside space-y-2 text-slate-300">
             <li>Differentiate between basic passive components: Resistors, Capacitors, and Inductors.</li>
-            <li>Read resistor values using the 4-band color code system.</li>
+            <li>Read resistor values using the 4-band and 5-band color code systems.</li>
           </ul>
         </div>
       </section>

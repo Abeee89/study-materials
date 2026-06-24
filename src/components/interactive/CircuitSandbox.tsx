@@ -289,6 +289,29 @@ function CircuitSandboxContent() {
   const [touchDrag, setTouchDrag] = useState<TouchDragState | null>(null);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).__antigravityContext = {
+        chapterTitle: "Network Topology Concepts",
+        subChapterTitle: "Circuit Sandbox",
+        simulationState: {
+          moduleName: "Circuit Sandbox",
+          nodesCount: nodes.length,
+          edgesCount: edges.length,
+          powered,
+          circuitState: evalResult?.state || "idle",
+          message: evalResult?.message || "",
+          current_mA: evalResult?.current,
+        },
+      };
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        (window as any).__antigravityContext = undefined;
+      }
+    };
+  }, [nodes, edges, evalResult, powered]);
+
+  useEffect(() => {
     const raf = requestAnimationFrame(() => {
       setIsTouchDevice(
         typeof window !== 'undefined' &&

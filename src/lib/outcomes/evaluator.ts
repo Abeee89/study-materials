@@ -1,6 +1,6 @@
 import "server-only";
 
-import { openRouterChatCompletion, type OpenRouterChatMessage } from "@/lib/openrouter";
+import { aiChatCompletion, type AIChatMessage } from "@/lib/ai";
 
 export type LearningOutcomesEvaluation = {
   strengths: string[];
@@ -85,12 +85,12 @@ Allowed site feature references for recommendedNextAction:
 
   const userContent = `Available Lessons to Recommend (JSON): ${JSON.stringify(params.allSubChapters ?? [])}\n\nQuiz Context (JSON): ${JSON.stringify(params.quizContext ?? null)}\n\nStudent Attempt Data (JSON): ${JSON.stringify(params.attemptData)}`;
 
-  const messages: OpenRouterChatMessage[] = [
+  const messages: AIChatMessage[] = [
     { role: "system", content: systemInstruction },
     { role: "user", content: userContent },
   ];
 
-  const raw = (await openRouterChatCompletion({
+  const raw = (await aiChatCompletion({
     messages,
     temperature: 0.2,
     maxTokens: 700,

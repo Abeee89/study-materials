@@ -5,6 +5,7 @@ import { ArrowLeft, BookOpen, Compass, ChevronRight, ChevronLeft, Award } from "
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { SubChapterContextUpdater } from "@/components/interactive/SubChapterContextUpdater";
 
 export const dynamic = "force-dynamic";
 
@@ -192,6 +193,11 @@ export default async function SubChapterReaderPage({ params }: SubChapterPagePro
           </div>
         </article>
       </main>
+      <SubChapterContextUpdater
+        chapterTitle={subChapter.chapter.title}
+        subChapterTitle={subChapter.title}
+        subChapterObjective={subChapter.objective || ""}
+      />
     </div>
   );
 }
