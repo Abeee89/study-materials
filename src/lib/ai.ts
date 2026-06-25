@@ -1,4 +1,3 @@
-import "server-only";
 import { openRouterChatCompletion } from "./openrouter";
 
 export type AIChatMessage = {

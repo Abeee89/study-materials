@@ -1,5 +1,3 @@
-import "server-only";
-
 import { aiChatCompletion, type AIChatMessage } from "@/lib/ai";
 
 export type LearningOutcomesEvaluation = {

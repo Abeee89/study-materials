@@ -1,5 +1,3 @@
-import "server-only";
-
 export type OpenRouterChatMessage = {
   role: "system" | "user" | "assistant";
   content: string;
