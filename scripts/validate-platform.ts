@@ -87,7 +87,7 @@ async function main() {
 
     console.log(`✅ Outcome Evaluator completed in ${duration}ms!`);
     console.log(`   - Feedback preview: "${result.feedback.substring(0, 120).replace(/\n/g, " ")}..."`);
-    console.log(`   - Recommended SubChapters:`, result.recommendedSubChapters);
+    console.log(`   - Recommended SubChapters:`, result.parsed?.recommendedSubChapters);
   } catch (error) {
     console.error("❌ Outcome Evaluator test failed:", error);
   }

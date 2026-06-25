@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateLearningOutcomesFeedback } from "@/lib/outcomes/evaluator";
+import { prisma } from "@/lib/prisma";
 
 type EvaluatorRequestBody = {
   attemptData: unknown;

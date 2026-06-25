@@ -183,7 +183,7 @@ export async function POST(req: Request) {
         const legacyAssessmentObj = await prisma.assessment.findUnique({
           where: { id: assessmentId }
         });
-        if (legacyAssessmentObj) {
+        if (legacyAssessmentObj && legacyAssessmentObj.chapterOrder !== null) {
           const chapter = await prisma.chapter.findFirst({
             where: { sortOrder: legacyAssessmentObj.chapterOrder },
           });
